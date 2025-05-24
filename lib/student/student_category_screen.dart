@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_quizzapp/student/common_bottom_nav.dart';
+import 'package:firebase_quizzapp/student/student_dashboard_screen.dart';
+import 'logout_drawer.dart';
 
 class StudentCategoryScreen extends StatefulWidget {
   final String studentName;
@@ -14,45 +17,48 @@ class StudentCategoryScreen extends StatefulWidget {
   State<StudentCategoryScreen> createState() => _StudentCategoryScreenState();
 }
 
-class _StudentCategoryScreenState extends State<StudentCategoryScreen>
-    with SingleTickerProviderStateMixin {
+class _StudentCategoryScreenState extends State<StudentCategoryScreen> {
+  int _selectedIndex = 1;
   bool _englishExpanded = false;
   bool _mathExpanded = false;
   bool _economicsExpanded = false;
   bool _agricExpanded = false;
   bool _biologyExpanded = false;
 
+  void _onNavTap(int index) {
+    if (index == _selectedIndex) return;
+    setState(() {
+      _selectedIndex = index;
+    });
+    Widget page;
+    if (index == 0) {
+      page = const StudentDashboardScreen();
+    } else if (index == 1) {
+      page = const StudentCategoryScreen();
+    } else if (index == 2) {
+      // page = const ResultScreen(); // Uncomment when implemented
+      return;
+    } else if (index == 3) {
+      // page = const ProfileScreen(); // Uncomment when implemented
+      return;
+    } else {
+      return;
+    }
+    Navigator.of(context).pushReplacement(PageRouteBuilder(
+      pageBuilder: (_, __, ___) => page,
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const LogoutDrawer(),
       backgroundColor: Colors.white,
-      bottomNavigationBar: SizedBox(
-        height: 80,
-        child: BottomNavigationBar(
-          backgroundColor: const Color(0xFF181DB4),
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white70,
-          type: BottomNavigationBarType.fixed,
-          currentIndex: 1, // Category tab active
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "Home",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.category),
-              label: "Category",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart),
-              label: "Result",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: "Profile",
-            ),
-          ],
-        ),
+      bottomNavigationBar: CommonBottomNav(
+        currentIndex: _selectedIndex,
+        onTap: _onNavTap,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -176,60 +182,30 @@ class _StudentCategoryScreenState extends State<StudentCategoryScreen>
                       child: _englishExpanded
                           ? Container(
                               color: Colors.white,
-                              child: Column(
+                              child: const Column(
                                 children: [
                                   _CategoryQuizRow(
                                     title: "Passage Comprehension",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "English Language",
-                                          topic: "Passage Comprehension",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "English Language",
                                   ),
-                                  const Divider(height: 1, color: Colors.black12),
+                                  Divider(height: 1, color: Colors.black12),
                                   _CategoryQuizRow(
                                     title: "Lexis & Structure Practice",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "English Language",
-                                          topic: "Lexis & Structure Practice",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "English Language",
                                   ),
-                                  const Divider(height: 1, color: Colors.black12),
+                                  Divider(height: 1, color: Colors.black12),
                                   _CategoryQuizRow(
                                     title: "Synonyms & Antonyms Drill",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "English Language",
-                                          topic: "Synonyms & Antonyms Drill",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "English Language",
                                   ),
                                 ],
                               ),
@@ -309,60 +285,30 @@ class _StudentCategoryScreenState extends State<StudentCategoryScreen>
                       child: _mathExpanded
                           ? Container(
                               color: Colors.white,
-                              child: Column(
+                              child: const Column(
                                 children: [
                                   _CategoryQuizRow(
                                     title: "Algebra Basics",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Mathematics",
-                                          topic: "Algebra Basics",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Mathematics",
                                   ),
-                                  const Divider(height: 1, color: Colors.black12),
+                                  Divider(height: 1, color: Colors.black12),
                                   _CategoryQuizRow(
                                     title: "Geometry Fundamentals",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Mathematics",
-                                          topic: "Geometry Fundamentals",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Mathematics",
                                   ),
-                                  const Divider(height: 1, color: Colors.black12),
+                                  Divider(height: 1, color: Colors.black12),
                                   _CategoryQuizRow(
                                     title: "Calculus Introduction",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Mathematics",
-                                          topic: "Calculus Introduction",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Mathematics",
                                   ),
                                 ],
                               ),
@@ -442,60 +388,30 @@ class _StudentCategoryScreenState extends State<StudentCategoryScreen>
                       child: _economicsExpanded
                           ? Container(
                               color: Colors.white,
-                              child: Column(
+                              child: const Column(
                                 children: [
                                   _CategoryQuizRow(
                                     title: "Microeconomics Principles",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Economics",
-                                          topic: "Microeconomics Principles",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Economics",
                                   ),
-                                  const Divider(height: 1, color: Colors.black12),
+                                  Divider(height: 1, color: Colors.black12),
                                   _CategoryQuizRow(
                                     title: "Macroeconomics Overview",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Economics",
-                                          topic: "Macroeconomics Overview",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Economics",
                                   ),
-                                  const Divider(height: 1, color: Colors.black12),
+                                  Divider(height: 1, color: Colors.black12),
                                   _CategoryQuizRow(
                                     title: "Econometrics Basics",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Economics",
-                                          topic: "Econometrics Basics",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Economics",
                                   ),
                                 ],
                               ),
@@ -575,60 +491,30 @@ class _StudentCategoryScreenState extends State<StudentCategoryScreen>
                       child: _agricExpanded
                           ? Container(
                               color: Colors.white,
-                              child: Column(
+                              child: const Column(
                                 children: [
                                   _CategoryQuizRow(
                                     title: "Soil Composition and Properties",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Agricultural Science",
-                                          topic: "Soil Composition and Properties",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Agricultural Science",
                                   ),
-                                  const Divider(height: 1, color: Colors.black12),
+                                  Divider(height: 1, color: Colors.black12),
                                   _CategoryQuizRow(
                                     title: "Crop Physiology and Ecology",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Agricultural Science",
-                                          topic: "Crop Physiology and Ecology",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Agricultural Science",
                                   ),
-                                  const Divider(height: 1, color: Colors.black12),
+                                  Divider(height: 1, color: Colors.black12),
                                   _CategoryQuizRow(
                                     title: "Agricultural Biotechnology",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Agricultural Science",
-                                          topic: "Agricultural Biotechnology",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Agricultural Science",
                                   ),
                                 ],
                               ),
@@ -708,60 +594,30 @@ class _StudentCategoryScreenState extends State<StudentCategoryScreen>
                       child: _biologyExpanded
                           ? Container(
                               color: Colors.white,
-                              child: Column(
+                              child: const Column(
                                 children: [
                                   _CategoryQuizRow(
                                     title: "Cell Structure and Function",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Biology",
-                                          topic: "Cell Structure and Function",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Biology",
                                   ),
-                                  const Divider(height: 1, color: Colors.black12),
+                                  Divider(height: 1, color: Colors.black12),
                                   _CategoryQuizRow(
                                     title: "Genetic Principles and Applications",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Biology",
-                                          topic: "Genetic Principles and Applications",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Biology",
                                   ),
-                                  const Divider(height: 1, color: Colors.black12),
+                                  Divider(height: 1, color: Colors.black12),
                                   _CategoryQuizRow(
                                     title: "Evolution and Biodiversity",
                                     questions: 20,
-                                    onViewQuiz: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const _QuizSummaryDialog(
-                                          subject: "Biology",
-                                          topic: "Evolution and Biodiversity",
-                                          questions: 20,
-                                          time: "30mins",
-                                        ),
-                                      );
-                                    },
-                                    buttonColor: const Color(0xFFFFBA31),
+                                    buttonColor: Color(0xFFFFBA31),
                                     textColor: Colors.black,
+                                    subject: "Biology",
                                   ),
                                 ],
                               ),
@@ -783,15 +639,15 @@ class _StudentCategoryScreenState extends State<StudentCategoryScreen>
 class _CategoryQuizRow extends StatelessWidget {
   final String title;
   final int questions;
-  final VoidCallback onViewQuiz;
   final Color buttonColor;
   final Color textColor;
+  final String subject;
 
   const _CategoryQuizRow({
     required this.title,
     required this.questions,
-    required this.onViewQuiz,
     required this.buttonColor,
+    required this.subject,
     this.textColor = Colors.white,
   });
 
@@ -822,7 +678,17 @@ class _CategoryQuizRow extends StatelessWidget {
             ),
           ),
           ElevatedButton(
-            onPressed: onViewQuiz,
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => _QuizSummaryDialog(
+                  subject: subject,
+                  topic: title,
+                  questions: questions,
+                  time: "30mins",
+                ),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: buttonColor,
               shape: RoundedRectangleBorder(
@@ -919,7 +785,7 @@ class _QuizSummaryDialog extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  // TODO: Start quiz logic here
+                  Navigator.pushNamed(context, '/question');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF181DB4),

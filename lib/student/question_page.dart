@@ -59,7 +59,7 @@ class _QuestionPageState extends State<QuestionPage> {
                   color: Colors.black87,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 2), // even less space
               Text(
                 "Question ${widget.questionNumber}/${widget.totalQuestions}",
                 style: const TextStyle(
@@ -67,9 +67,8 @@ class _QuestionPageState extends State<QuestionPage> {
                   color: Colors.black54,
                 ),
               ),
-              // Move progress indicator to the right and a bit up
               Padding(
-                padding: const EdgeInsets.only(top: 4.0),
+                padding: const EdgeInsets.only(top: 0.0, bottom: 0.0), // minimal space
                 child: Row(
                   children: [
                     const Spacer(),
@@ -77,7 +76,7 @@ class _QuestionPageState extends State<QuestionPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 2), // minimal space before question card
               // Question container
               Stack(
                 children: [
@@ -93,15 +92,17 @@ class _QuestionPageState extends State<QuestionPage> {
                   Positioned.fill(
                     child: Container(
                       alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: const Text(
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut laoreet facilisis, massa erat dictum urna, at dictum velit enim non erat.",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           color: Colors.black,
                           fontWeight: FontWeight.w600,
                         ),
                         textAlign: TextAlign.center,
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
