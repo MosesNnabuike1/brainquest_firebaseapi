@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "381596682297",
+    "project_id": "brainquest-49384",
+    "storage_bucket": "brainquest-49384.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381596682297:android:5da7f81ccf8d71b9f925e8",
+        "android_client_info": {
+          "package_name": "com.example.firebase_quizzapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBR1qMAnVQYw-kK4wr62jHrCrZgPvZJI6o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

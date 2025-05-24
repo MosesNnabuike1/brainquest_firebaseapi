@@ -1,0 +1,114 @@
+import 'package:flutter/material.dart';
+//import 'auth/student_login_screen.dart'; // Import the LoginScreen
+// import '../admin/welcome_screen.dart';
+//import 'auth/student_registration_screen.dart'; // Import the Admin Welcome Screen
+
+class StudentWelcomeScreen extends StatelessWidget {
+  const StudentWelcomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF181DB4),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 50),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Modern Image
+                SizedBox(
+                  // width: 100,
+                  // height: 100,
+                  child: ClipRRect(
+                    child: Image.asset(
+                      'assets/logo.png',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 120),
+                // Welcome Text
+                
+                const Text(
+                  'Welcome to Brain Quest',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                // Get Started Button (go to registration)
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/register');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFFAA00),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 5,
+                    ),
+                    child: const Text(
+                      'Get Started',
+                      style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 0, 0, 0)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Sign in Button (go to login)
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/login');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF181DB4),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        side: const BorderSide(color: Colors.white),
+                      ),
+                      elevation: 5,
+                    ),
+                    child: const Text(
+                      'Sign in',
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                  ),
+                ),
+                // const SizedBox(height: 20),
+                // TextButton(
+                //   onPressed: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+                //     );
+                //   },
+                //   child: const Text(
+                //     'Click here to become an Admin',
+                //     style: TextStyle(
+                //       color: Colors.blueAccent,
+                //       fontSize: 16,
+                //       decoration: TextDecoration.underline,
+                //       decorationColor: Colors.red,
+                //     ),
+                //   ),
+                // ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
