@@ -1,7 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_quizzapp/student/student_category_screen.dart';
 import 'package:flutter/material.dart';
+import 'common_bottom_nav.dart';
+import 'logout_drawer.dart';
 
-class StudentDashboardScreen extends StatelessWidget {
+class StudentDashboardScreen extends StatefulWidget {
   final String studentName;
   final String profileImageUrl;
 
@@ -11,38 +13,40 @@ class StudentDashboardScreen extends StatelessWidget {
     this.profileImageUrl = "",
   }) : super(key: key);
 
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirm Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(), // Cancel
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF181DB4),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onPressed: () async {
-              Navigator.of(context).pop(); // Close dialog
-              await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                '/',
-                (route) => false,
-              );
-            },
-            child: const Text('Logout', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
+  @override
+  State<StudentDashboardScreen> createState() => _StudentDashboardScreenState();
+}
+
+class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
+  int _selectedIndex = 0;
+
+  void _onNavTap(int index) {
+    if (index == _selectedIndex) return;
+    setState(() {
+      _selectedIndex = index;
+    });
+    // Use pushReplacement with no animation for seamless navigation
+    Widget page;
+    if (index == 0) {
+      page = const StudentDashboardScreen();
+    } else if (index == 1) {
+      page = const StudentCategoryScreen();
+    } else if (index == 2) {
+      // page = const ResultScreen(); // Uncomment when implemented
+      return;
+    } else if (index == 3) {
+      // page = const ProfileScreen(); // Uncomment when implemented
+      return;
+    } else {
+      return;
+    }
+    Navigator.of(context).pushReplacement(PageRouteBuilder(
+      pageBuilder: (_, __, ___) => page,
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
+    ));
   }
+
 
   void _openDrawer(BuildContext context) {
     Scaffold.of(context).openDrawer();
@@ -51,55 +55,11 @@ class StudentDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: SizedBox(
-        width: 220, // Set drawer width as desired
-        child: Drawer(
-          child: SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 30),
-                ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text('Logout'),
-                  onTap: () {
-                    Navigator.of(context).pop(); // Close drawer
-                    _showLogoutDialog(context);
-                  },
-                ),
-                // ...existing code...
-              ],
-            ),
-          ),
-        ),
-      ),
+      drawer: const LogoutDrawer(),
       backgroundColor: Colors.white,
-      bottomNavigationBar: SizedBox(
-        height: 80,
-        child: BottomNavigationBar(
-          backgroundColor: const Color(0xFF181DB4),
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white70,
-          type: BottomNavigationBarType.fixed,
-          currentIndex: 0,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "Home",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.category),
-              label: "Category",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart),
-              label: "Result",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: "Profile",
-            ),
-          ],
-        ),
+      bottomNavigationBar: CommonBottomNav(
+        currentIndex: _selectedIndex,
+        onTap: _onNavTap,
       ),
       body: SafeArea(
         child: Builder(
@@ -116,10 +76,10 @@ class StudentDashboardScreen extends StatelessWidget {
                       onTap: () => _openDrawer(context),
                       child: CircleAvatar(
                         radius: 24,
-                        backgroundImage: profileImageUrl.isNotEmpty
-                            ? NetworkImage(profileImageUrl)
+                        backgroundImage: widget.profileImageUrl.isNotEmpty
+                            ? NetworkImage(widget.profileImageUrl)
                             : null,
-                        child: profileImageUrl.isEmpty
+                        child: widget.profileImageUrl.isEmpty
                             ? const Icon(Icons.person, size: 28)
                             : null,
                       ),
@@ -141,7 +101,7 @@ class StudentDashboardScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 // Welcome Texts
                 Text(
-                  "Welcome, $studentName",
+                  "Welcome, ${widget.studentName}",
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
