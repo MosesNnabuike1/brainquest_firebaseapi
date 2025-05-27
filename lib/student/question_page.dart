@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'widgets/question_header.dart';
+import 'widgets/question_card.dart';
+import 'widgets/option_tile.dart';
+import 'widgets/answer_overlay.dart';
+import 'widgets/general_button_widget.dart';
 
 class QuestionPage extends StatefulWidget {
   final String subject;
@@ -18,213 +23,134 @@ class QuestionPage extends StatefulWidget {
   State<QuestionPage> createState() => _QuestionPageState();
 }
 
-class _QuestionPageState extends State<QuestionPage> {
+class _QuestionPageState extends State<QuestionPage>
+    with SingleTickerProviderStateMixin {
   int? _selectedOption;
+  bool _showCorrectOverlay = false;
+  bool _isCorrect = true;
+  late AnimationController _controller;
+  late Animation<Offset> _offsetAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _offsetAnimation = Tween<Offset>(
+      begin: const Offset(0, 1.2),
+      end: const Offset(0, 0),
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onOptionTap(int index) {
+    setState(() {
+      _selectedOption = index;
+    });
+    // Option A (index 0) is correct, Option B (index 1) is wrong
+    if (index == 0) {
+      setState(() {
+        _isCorrect = true;
+        _showCorrectOverlay = true;
+      });
+      _controller.forward();
+    } else if (index == 1) {
+      setState(() {
+        _isCorrect = false;
+        _showCorrectOverlay = true;
+      });
+      _controller.forward();
+    }
+    // For other options, you can add logic as needed
+  }
+
+  void _onNextQuestion() {
+    setState(() {
+      _showCorrectOverlay = false;
+      _selectedOption = null;
+    });
+    _controller.reset();
+    // TODO: Load next question logic here
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top bar with back button and subject
-              Row(
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).maybePop(),
-                    child: const Icon(Icons.arrow_back_ios, color: Colors.black),
+                  QuestionHeader(
+                    subject: widget.subject,
+                    topic: widget.topic,
+                    questionNumber: widget.questionNumber,
+                    totalQuestions: widget.totalQuestions,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    widget.subject,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
+                  const SizedBox(height: 8),
+                  const QuestionCard(
+                    questionText:
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut laoreet facilisis, massa erat dictum urna, at dictum velit enim non erat.",
+                  ),
+                  const SizedBox(height: 32),
+                  OptionTile(
+                    index: 0,
+                    text: "Option A",
+                    selectedOption: _selectedOption,
+                    onTap: _onOptionTap,
+                  ),
+                  const SizedBox(height: 14),
+                  OptionTile(
+                    index: 1,
+                    text: "Option B",
+                    selectedOption: _selectedOption,
+                    onTap: _onOptionTap,
+                  ),
+                  const SizedBox(height: 14),
+                  OptionTile(
+                    index: 2,
+                    text: "Option C",
+                    selectedOption: _selectedOption,
+                    onTap: _onOptionTap,
+                  ),
+                  const SizedBox(height: 14),
+                  OptionTile(
+                    index: 3,
+                    text: "Option D",
+                    selectedOption: _selectedOption,
+                    onTap: _onOptionTap,
                   ),
                   const Spacer(),
-                ],
-              ),
-              const SizedBox(height: 18),
-              Text(
-                widget.topic,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 2), // even less space
-              Text(
-                "Question ${widget.questionNumber}/${widget.totalQuestions}",
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black54,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 0.0, bottom: 0.0), // minimal space
-                child: Row(
-                  children: [
-                    const Spacer(),
-                    _buildProgressIndicator(),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 2), // minimal space before question card
-              // Question container
-              Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(18),
-                    child: Image.asset(
-                      'assets/questioncard.png',
-                      width: double.infinity,
-                      height: 140,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: const Text(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut laoreet facilisis, massa erat dictum urna, at dictum velit enim non erat.",
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                  GeneralButtonWidget(
+                    text: "Submit",
+                    onPressed: _selectedOption != null ? () {} : null,
+                    enabled: _selectedOption != null,
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
-              // Options
-              _buildOption(0, "Option A"),
-              const SizedBox(height: 14),
-              _buildOption(1, "Option B"),
-              const SizedBox(height: 14),
-              _buildOption(2, "Option C"),
-              const SizedBox(height: 14),
-              _buildOption(3, "Option D"),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _selectedOption != null ? () {} : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF181DB4),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: const Text(
-                    "Submit",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOption(int index, String text) {
-    final optionLabels = ['A', 'B', 'C', 'D'];
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedOption = index;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(
-            color: _selectedOption == index ? const Color(0xFF181DB4) : Colors.black26,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: _selectedOption == index ? const Color(0xFF181DB4) : Colors.black26,
-                  width: 2,
-                ),
-                color: Colors.white,
-              ),
-              child: Center(
-                child: Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _selectedOption == index ? const Color(0xFF181DB4) : Colors.transparent,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              optionLabels[index],
-              style: TextStyle(
-                color: _selectedOption == index ? const Color(0xFF181DB4) : Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                text,
-                style: const TextStyle(fontSize: 16, color: Colors.black),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProgressIndicator() {
-    return SizedBox(
-      width: 110,
-      height: 110,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CircularProgressIndicator(
-            value: widget.questionNumber / widget.totalQuestions,
-            backgroundColor: Colors.black26,
-            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF22C55E)),
-            strokeWidth: 14, // Even thicker
-          ),
-          Center(
-            child: Text(
-              "${widget.questionNumber}",
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
           ),
+          if (_showCorrectOverlay)
+            CorrectOverlay(
+              controller: _controller,
+              offsetAnimation: _offsetAnimation,
+              onNextQuestion: _onNextQuestion,
+              isCorrect: _isCorrect,
+            ),
         ],
       ),
     );

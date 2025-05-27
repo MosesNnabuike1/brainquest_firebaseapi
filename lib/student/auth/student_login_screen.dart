@@ -3,6 +3,7 @@ import 'package:firebase_quizzapp/student/student_dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_quizzapp/student/auth/student_forgot_password_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,6 +15,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _showPassword = false;
 
   Future<void> _loginUser() async {
     String input = _emailController.text.trim();
@@ -155,19 +157,30 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 8),
               TextField(
                 controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
+                obscureText: !_showPassword,
+                decoration: InputDecoration(
                   hintText: 'Enter Password',
-                  border: OutlineInputBorder(
+                  border: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black),
                   ),
-                  enabledBorder: OutlineInputBorder(
+                  enabledBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black),
                   ),
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black, width: 2),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _showPassword ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.black54,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _showPassword = !_showPassword;
+                      });
+                    },
+                  ),
                 ),
               ),
               const SizedBox(height: 0),
@@ -178,26 +191,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(color: Colors.black54),
                 ),
               ),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _loginUser,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF181DB4), // Same as registration
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    elevation: 5,
-                  ),
-                  child: const Text(
-                    'Sign In',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
+              GeneralButtonWidget(
+                text: 'Sign In',
+                onPressed: _loginUser,
               ),
               const SizedBox(height: 0),
               
