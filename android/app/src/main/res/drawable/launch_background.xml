@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Set a solid blue background -->
-    <item android:drawable="@color/splash_bg"/>
-    <!-- Center your app logo -->
     <item>
-        <bitmap android:gravity="center" android:src="@drawable/logo"/>
+        <bitmap android:gravity="fill" android:src="@drawable/background"/>
     </item>
-    <!-- Optional: branding text/image at the bottom (remove if not needed) -->
-    <!--
+    <item>
+        <bitmap android:gravity="center" android:src="@drawable/splash"/>
+    </item>
     <item android:bottom="0dp">
-        <bitmap android:gravity="bottom" android:src="@drawable/brainquest"/>
+        <bitmap android:gravity="bottom" android:src="@drawable/branding"/>
     </item>
-    -->
 </layer-list>

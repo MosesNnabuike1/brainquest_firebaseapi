@@ -1,17 +1,23 @@
-import 'package:firebase_quizzapp/student/student_welcome_screen.dart';
+import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_quizzapp/student/daily_quiz_screen.dart';
+import 'package:firebase_quizzapp/student/student_main_screen.dart';
+import 'package:firebase_quizzapp/student/student_welcome_screen.dart';
 import 'package:firebase_quizzapp/student/auth/student_login_screen.dart';
 import 'package:firebase_quizzapp/student/auth/student_registration_screen.dart';
-import 'package:firebase_quizzapp/student/question_page.dart';
-//import 'package:firebase_quizzapp/student/student_welcome_screen.dart';
-import 'package:firebase_quizzapp/student/student_dashboard_screen.dart';
-import 'package:firebase_quizzapp/student/student_category_screen.dart';
-// import result and profile pages when created
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    // Optionally handle errors here, but no print statements
+  }
+
   runApp(const MyApp());
 }
 
@@ -21,20 +27,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Firebase Quiz App',
+      title: 'BrainQuest',
       theme: ThemeData(
+        fontFamily: 'Poppins',
         primarySwatch: Colors.blue,
+        textTheme: ThemeData.light().textTheme.copyWith(
+          bodyLarge: const TextStyle(fontFamily: 'Poppins', color: Colors.black),
+          bodyMedium: const TextStyle(fontFamily: 'Poppins', color: Colors.black),
+          titleLarge: const TextStyle(fontFamily: 'Poppins', color: Colors.black),
+        ),
       ),
       home: const StudentWelcomeScreen(),
       debugShowCheckedModeBanner: false,
       routes: {
         '/register': (context) => const StudentRegistrationScreen(),
         '/login': (context) => const LoginScreen(),
-        '/home': (context) => const StudentDashboardScreen(),
-        '/category': (context) => const StudentCategoryScreen(),
-        '/question': (context) => const QuestionPage(),
-        // '/result': (context) => ResultScreen(), // Uncomment and implement
-        // '/profile': (context) => ProfileScreen(), // Uncomment and implement
+        '/home': (context) => const StudentMainScreen(),
+        '/category': (context) => const StudentMainScreen(),
+        '/results': (context) => const StudentMainScreen(),
+        '/daily-quiz': (context) => const DailyQuizScreen(),
+        // If you have a profile page, uncomment and implement:
+        // '/profile': (context) => const ProfilePage(),
       },
     );
   }

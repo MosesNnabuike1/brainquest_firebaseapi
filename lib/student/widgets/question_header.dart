@@ -5,6 +5,13 @@ class QuestionHeader extends StatelessWidget {
   final String topic;
   final int questionNumber;
   final int totalQuestions;
+  final double progress;
+
+  // Design constants
+  static const double _circleDiameter = 80.0;
+  static const double _strokeWidth = 8.0;
+  static const Color _progressBg = Color(0xFFE0E0E0);
+  static const Color _progressColor = Color(0xFFFFBA31);
 
   const QuestionHeader({
     Key? key,
@@ -12,6 +19,7 @@ class QuestionHeader extends StatelessWidget {
     required this.topic,
     required this.questionNumber,
     required this.totalQuestions,
+    required this.progress,
   }) : super(key: key);
 
   @override
@@ -19,69 +27,50 @@ class QuestionHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            GestureDetector(
-              onTap: () => Navigator.of(context).maybePop(),
-              child: const Icon(Icons.arrow_back_ios, color: Colors.black),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              subject,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.black,
-              ),
-            ),
-            const Spacer(),
-          ],
+        // Subject and Topic
+        Text(
+          "$subject - $topic",
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.black54,
+          ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 8),
+        // Question Number and Progress Circle
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Text(
+              "Question $questionNumber/$totalQuestions",
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            Stack(
+              alignment: Alignment.center,
               children: [
+                SizedBox(
+                  width: _circleDiameter,
+                  height: _circleDiameter,
+                  child: CircularProgressIndicator(
+                    value: progress,
+                    backgroundColor: _progressBg,
+                    valueColor: const AlwaysStoppedAnimation<Color>(_progressColor),
+                    strokeWidth: _strokeWidth,
+                  ),
+                ),
                 Text(
-                  topic,
+                  "${(progress * 100).toInt()}%",
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  "Question $questionNumber/$totalQuestions",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
-                ),
               ],
-            ),
-            SizedBox(
-              width: 140,
-              height: 140,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    value: questionNumber / totalQuestions,
-                    backgroundColor: Colors.black26,
-                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF22C55E)),
-                    strokeWidth: 14,
-                  ),
-                  Center(
-                    child: Text(
-                      "$questionNumber",
-                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ],
         ),

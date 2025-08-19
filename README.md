@@ -14,3 +14,9 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+<!-- Your project root directory is:
+c:\Users\BUIKEM\OneDrive\Desktop\Flutter_Projets\FireBaseQuizApp\firebase_quizzapp
+
+To change to this directory in your terminal or command prompt, use:
+cd "c:\Users\BUIKEM\OneDrive\Desktop\Flutter_Projets\FireBaseQuizApp\firebase_quizzapp" -->

@@ -17,6 +17,11 @@ dependencies:
   google_sign_in: ^6.2.2
   flutter_native_splash: ^2.3.10
   email_validator: ^3.0.0
+  flutter_svg: ^2.1.0
+  image_picker: ^1.1.2
+  firebase_storage: ^12.4.7
+  shared_preferences: ^2.2.2
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
@@ -26,14 +31,37 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/logo.png
     - assets/logo2.png
+    - assets/logo.png
     - assets/questioncard.png
+    - assets/dp.png
+    - assets/icons/
+  fonts:
+  #   - family: Inter
+  #     fonts:
+  #       - asset: font/Inter/Inter-Regular.ttf
+  #       - asset: font/Inter/Inter-Bold.ttf
+  #         weight: 700
+  #       - asset: font/Inter/Inter-Medium.ttf
+  #         weight: 500
+  #       - asset: font/Inter/Inter-SemiBold.ttf
+  #         weight: 600
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/poppins/Poppins-Regular.ttf
+        - asset: assets/fonts/poppins/Poppins-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/poppins/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/poppins/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/poppins/Poppins-Light.ttf
+          weight: 300
 
 flutter_native_splash:
-  color: "#1976D2" 
-  image: assets/logo.png 
-  branding: assets/brainquest.png 
+  color: "#1976D2"
+  image: assets/logo2.png
+  branding: assets/brainquest.png
   android: true
   ios: true
   web: false

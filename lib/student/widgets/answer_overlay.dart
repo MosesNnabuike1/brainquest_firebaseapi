@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
 
 class CorrectOverlay extends StatelessWidget {
@@ -6,25 +7,27 @@ class CorrectOverlay extends StatelessWidget {
   final Animation<Offset> offsetAnimation;
   final VoidCallback onNextQuestion;
   final bool isCorrect;
+  final String buttonText;
 
   const CorrectOverlay({
     Key? key,
     required this.controller,
     required this.offsetAnimation,
     required this.onNextQuestion,
-    this.isCorrect = true,
+    required this.isCorrect,
+    required this.buttonText,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: [
+      children: <Widget>[
         // Dim background
         Positioned.fill(
-          child: Container(
-            color: Colors.black.withOpacity(0.45),
-          ),
+          child: Container(color: Colors.black.withOpacity(0.45)),
         ),
+
+        // Slide-up "sheet"
         AnimatedBuilder(
           animation: controller,
           builder: (context, child) {
@@ -35,14 +38,15 @@ class CorrectOverlay extends StatelessWidget {
                 child: Material(
                   color: Colors.transparent,
                   child: Container(
-                    width: MediaQuery.of(context).size.width,
+                    width: double.infinity,
                     constraints: const BoxConstraints(
                       minHeight: 300,
                       maxHeight: 400,
                     ),
-                    margin: EdgeInsets.zero,
                     padding: const EdgeInsets.symmetric(
-                        vertical: 28, horizontal: 18),
+                      vertical: 28,
+                      horizontal: 18,
+                    ),
                     decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -52,61 +56,8 @@ class CorrectOverlay extends StatelessWidget {
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        // Good/Bad icon with stars
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            // Left stars (2)
-                            Transform.translate(
-                              offset: const Offset(25, -30),
-                              child: const Icon(Icons.star,
-                                  color: Colors.orange, size: 24),
-                            ),
-                            Transform.translate(
-                              offset: const Offset(-18, -45),
-                              child: Icon(Icons.star,
-                                  color: Colors.orange.withOpacity(0.2),
-                                  size: 16),
-                            ),
-                            // Good or Bad icon in colored circle
-                            Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: isCorrect
-                                    ? const Color(0xFFFFBA31)
-                                    : Colors.red,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                isCorrect
-                                    ? Icons.thumb_up_alt_rounded
-                                    : Icons.thumb_down_alt_rounded,
-                                color: Colors.white,
-                                size: 32,
-                              ),
-                            ),
-                            // Right stars (2)
-                            Transform.translate(
-                              offset: const Offset(18, -45),
-                              child: Icon(
-                                Icons.star,
-                                color: Colors.orange.withOpacity(0.2),
-                                size: 16,
-                              ),
-                            ),
-                            Transform.translate(
-                              offset: const Offset(-25, -30),
-                              child: const Icon(Icons.star,
-                                  color: Colors.orange, size: 24),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 18),
+                      children: <Widget>[
+                        _buildStarsAndCenterIcon(),
                         const SizedBox(height: 18),
                         Text(
                           isCorrect ? "Brilliant!" : "Oops!",
@@ -130,7 +81,7 @@ class CorrectOverlay extends StatelessWidget {
                         ),
                         const SizedBox(height: 22),
                         GeneralButtonWidget(
-                          text: isCorrect ? "Next Question" : "Try Again",
+                          text: buttonText,
                           onPressed: onNextQuestion,
                           enabled: true,
                         ),
@@ -141,6 +92,64 @@ class CorrectOverlay extends StatelessWidget {
               ),
             );
           },
+        ),
+      ],
+    );
+  } // end build
+
+  Widget _buildStarsAndCenterIcon() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+        // big star
+        Transform.translate(
+          offset: const Offset(25, -30),
+          child: const Icon(Icons.star, color: Colors.orange, size: 24),
+        ),
+        // small faded star
+        Transform.translate(
+          offset: const Offset(-18, -45),
+          child: Icon(
+            Icons.star,
+            color: Colors.orange.withOpacity(0.2),
+            size: 16,
+          ),
+        ),
+        // center circle + svg
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: isCorrect ? const Color(0xFFFFBA31) : Colors.red,
+            shape: BoxShape.circle,
+          ),
+          child: isCorrect
+              ? SvgPicture.asset(
+                  'assets/icons/good.svg',
+                  width: 32,
+                  height: 32,
+                  color: Colors.white,
+                )
+              : const Icon(
+                  Icons.close,
+                  size: 32,
+                  color: Colors.white,
+                ),
+        ),
+        // small faded star
+        Transform.translate(
+          offset: const Offset(18, -45),
+          child: Icon(
+            Icons.star,
+            color: Colors.orange.withOpacity(0.2),
+            size: 16,
+          ),
+        ),
+        // big star
+        Transform.translate(
+          offset: const Offset(-25, -30),
+          child: const Icon(Icons.star, color: Colors.orange, size: 24),
         ),
       ],
     );

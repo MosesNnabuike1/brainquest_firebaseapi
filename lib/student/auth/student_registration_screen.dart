@@ -1,9 +1,10 @@
-import 'package:firebase_quizzapp/models/student_details.dart';
-import 'package:firebase_quizzapp/student/auth/student_login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_quizzapp/models/student_details.dart';
+import 'package:firebase_quizzapp/widgets/cancel_icon_widget.dart';
+import 'package:firebase_quizzapp/student/auth/student_login_screen.dart';
 import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
 
 class StudentRegistrationScreen extends StatefulWidget {
@@ -128,7 +129,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
               .set({
             'fullName': _usernameController.text.trim(),
             'email': _emailController.text.trim(),
-            'role': 'student', // Distinguish as student
+            'role': 'student', 
             'createdAt': Timestamp.now(),
           });
 
@@ -146,10 +147,12 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
+                        Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const LoginScreen()),
+                            builder: (context) => const LoginScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -185,6 +188,10 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
               backgroundColor: Colors.red,
             ),
           );
+          setState(() {
+            _isLoading = false;
+          });
+          return;
         }
       }
     } catch (e) {
@@ -249,18 +256,21 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                   children: [
                     // Logo and X icon at top left
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Image.asset(
                           'assets/logo2.png',
                           width: 24,
                           height: 24,
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.close, color: Colors.black),
-                          onPressed: () {
-                            Navigator.of(context).maybePop();
-                          },
+                        const Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 0),
+                          child: CancelIconWidget(
+                            onTap: () => Navigator.of(context).pop(),
+                            rightPadding: 0,
+                            size: 18,
+                            color: const Color.fromARGB(137, 0, 0, 0),
+                          ),
                         ),
                       ],
                     ),
@@ -284,95 +294,86 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                       ),
                     ),
                     const SizedBox(height: 32),
-                    // Username
+                    // Username field
                     const Text(
-                      'Username',
+                      'Full Name',
                       style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _usernameController,
-                      validator: _validateUsername,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter Name',
+                      decoration: InputDecoration(
+                        hintText: 'Type your full name as it appears on your ID',
+                        hintStyle: const TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 15,
+                        ),
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black, width: 2),
-                        ),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                       ),
+                      validator: _validateUsername,
                     ),
-                    const SizedBox(height: 20),
-                    // Email
+                    const SizedBox(height: 16),
+                    // Email field
                     const Text(
                       'Email',
                       style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _emailController,
-                      validator: _validateEmail,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter Email',
+                      decoration: InputDecoration(
+                        hintText: 'Enter your email address',
+                        hintStyle: const TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 15,
+                        ),
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black, width: 2),
-                        ),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                       ),
                       keyboardType: TextInputType.emailAddress,
+                      validator: _validateEmail,
                     ),
-                    const SizedBox(height: 20),
-                    // Password
+                    const SizedBox(height: 16),
+                    // Password field
                     const Text(
                       'Password',
                       style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _passwordController,
-                      obscureText: !_showPassword,
-                      validator: _validatePassword,
                       decoration: InputDecoration(
-                        hintText: 'Enter Password',
-                        border: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
+                        hintText: 'Choose a strong password (min. 6 characters)',
+                        hintStyle: const TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 15,
                         ),
-                        enabledBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black, width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 14),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _showPassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: Colors.black54,
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                           ),
                           onPressed: () {
                             setState(() {
@@ -381,14 +382,17 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                           },
                         ),
                       ),
+                      obscureText: !_showPassword,
+                      validator: _validatePassword,
                     ),
-                    const SizedBox(height: 20),
-                    // Confirm Password
+                    const SizedBox(height: 16),
+                    // Confirm password field
                     const Text(
                       'Confirm Password',
                       style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -397,24 +401,20 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                       obscureText: !_showConfirmPassword,
                       validator: _validateConfirmPassword,
                       decoration: InputDecoration(
-                        hintText: 'Enter Password',
-                        border: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
+                        hintText: 'Re-enter your password for confirmation',
+                        hintStyle: const TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 15,
                         ),
-                        enabledBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black, width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 14),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _showConfirmPassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: Colors.black54,
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                           ),
                           onPressed: () {
                             setState(() {
