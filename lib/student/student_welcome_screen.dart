@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'auth/student_login_screen.dart'; // Import the LoginScreen
-// import '../admin/welcome_screen.dart';
-//import 'auth/student_registration_screen.dart'; // Import the Admin Welcome Screen
+import 'package:firebase_quizzapp/tutor/tutor_registration_screen.dart';
 
 class StudentWelcomeScreen extends StatelessWidget {
   const StudentWelcomeScreen({super.key});
@@ -21,8 +19,8 @@ class StudentWelcomeScreen extends StatelessWidget {
               children: [
                 // Modern Image
                 SizedBox(
-                  // width: 100,
-                  // height: 100,
+                  width: 100,
+                  height: 100,
                   child: ClipRRect(
                     child: Image.asset(
                       'assets/logo.png',
@@ -31,13 +29,12 @@ class StudentWelcomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 120),
                 // Welcome Text
-                
                 const Text(
                   'Welcome to Brain Quest',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Color.fromARGB(255, 255, 255, 255),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -59,7 +56,8 @@ class StudentWelcomeScreen extends StatelessWidget {
                     ),
                     child: const Text(
                       'Get Started',
-                      style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 0, 0, 0)),
+                      style: TextStyle(
+                          fontSize: 14, color: Color.fromARGB(255, 0, 0, 0)),
                     ),
                   ),
                 ),
@@ -86,24 +84,29 @@ class StudentWelcomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                // const SizedBox(height: 20),
-                // TextButton(
-                //   onPressed: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-                //     );
-                //   },
-                //   child: const Text(
-                //     'Click here to become an Admin',
-                //     style: TextStyle(
-                //       color: Colors.blueAccent,
-                //       fontSize: 16,
-                //       decoration: TextDecoration.underline,
-                //       decorationColor: Colors.red,
-                //     ),
-                //   ),
-                // ),
+                const SizedBox(height: 10),
+                // Tutor Registration Link
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TutorRegistrationScreen(),
+                      ),
+                    );
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'Register as Tutor',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
