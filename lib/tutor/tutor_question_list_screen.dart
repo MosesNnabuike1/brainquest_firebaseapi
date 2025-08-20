@@ -185,8 +185,7 @@ class _TutorQuestionListScreenState extends State<TutorQuestionListScreen> {
           : _error != null
               ? Center(child: Text(_error!))
               : ListView(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                   children: [
                     // Category info and actions
                     Container(
@@ -195,8 +194,7 @@ class _TutorQuestionListScreenState extends State<TutorQuestionListScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                            color: const Color(0xFF181DB4), width: 1),
+                        border: Border.all(color: const Color(0xFF181DB4), width: 1),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.04),
@@ -224,8 +222,7 @@ class _TutorQuestionListScreenState extends State<TutorQuestionListScreen> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.edit,
-                                color: Color(0xFF181DB4)),
+                            icon: const Icon(Icons.edit, color: Color(0xFF181DB4)),
                             tooltip: 'Edit Category',
                             onPressed: _editCategory,
                           ),
@@ -249,7 +246,17 @@ class _TutorQuestionListScreenState extends State<TutorQuestionListScreen> {
                         ),
                       ),
                     ),
-                    ..._questions.map((q) => Container(
+                    if (_questions.isEmpty)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 32),
+                          child: Text(
+                            'No questions yet. Add your first question!',
+                            style: TextStyle(fontSize: 17, color: Colors.grey[600], fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      )
+                    else ..._questions.map((q) => Container(
                           margin: const EdgeInsets.only(bottom: 18),
                           decoration: BoxDecoration(
                             color: Colors.transparent,
@@ -266,8 +273,7 @@ class _TutorQuestionListScreenState extends State<TutorQuestionListScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 0, vertical: 0),
+                                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -279,41 +285,31 @@ class _TutorQuestionListScreenState extends State<TutorQuestionListScreen> {
                                     Column(
                                       children: [
                                         IconButton(
-                                          icon: const Icon(Icons.edit,
-                                              color: Color(0xFF181DB4),
-                                              size: 22),
+                                          icon: const Icon(Icons.edit, color: Color(0xFF181DB4), size: 22),
                                           tooltip: 'Edit',
                                           onPressed: () => _editQuestion(q),
                                         ),
                                         IconButton(
-                                          icon: const Icon(Icons.delete,
-                                              color: Colors.red, size: 22),
+                                          icon: const Icon(Icons.delete, color: Colors.red, size: 22),
                                           tooltip: 'Delete',
                                           onPressed: () async {
-                                            final confirmed =
-                                                await showDialog<bool>(
+                                            final confirmed = await showDialog<bool>(
                                               context: context,
                                               builder: (context) => AppDialog(
                                                 title: 'Delete Question',
-                                                content: const Text(
-                                                    'Are you sure you want to delete this question? This action cannot be undone.'),
+                                                content: const Text('Are you sure you want to delete this question? This action cannot be undone.'),
                                                 actions: [
                                                   GeneralButtonWidget(
                                                     text: 'Cancel',
-                                                    onPressed: () =>
-                                                        Navigator.pop(
-                                                            context, false),
-                                                    backgroundColor:
-                                                        const Color(0xFFFFBA31),
+                                                    onPressed: () => Navigator.pop(context, false),
+                                                    backgroundColor: const Color(0xFFFFBA31),
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.bold,
                                                     textColor: Colors.black,
                                                   ),
                                                   GeneralButtonWidget(
                                                     text: 'Delete',
-                                                    onPressed: () =>
-                                                        Navigator.pop(
-                                                            context, true),
+                                                    onPressed: () => Navigator.pop(context, true),
                                                     backgroundColor: Colors.red,
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.bold,
@@ -339,18 +335,14 @@ class _TutorQuestionListScreenState extends State<TutorQuestionListScreen> {
                                 final idx = entry.key;
                                 final opt = entry.value;
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 3, horizontal: 8),
+                                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(44),
-                                      border: Border.all(
-                                          color: Colors.grey.shade300,
-                                          width: 2),
+                                      border: Border.all(color: Colors.grey.shade300, width: 2),
                                       color: Colors.white,
                                     ),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 15, horizontal: 18),
+                                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 18),
                                     child: Row(
                                       children: [
                                         Container(
@@ -358,31 +350,20 @@ class _TutorQuestionListScreenState extends State<TutorQuestionListScreen> {
                                           height: 22,
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: Colors.grey.shade400,
-                                              width: 2,
-                                            ),
+                                            border: Border.all(color: Colors.grey.shade400, width: 2),
                                             color: Colors.transparent,
                                           ),
                                         ),
                                         const SizedBox(width: 12),
                                         Text(
                                           '${String.fromCharCode(65 + idx)}.',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                            color: Colors.black87,
-                                          ),
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
                                         ),
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Text(
                                             q[opt] ?? '',
-                                            style: const TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 16,
-                                            ),
+                                            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 16),
                                           ),
                                         ),
                                       ],

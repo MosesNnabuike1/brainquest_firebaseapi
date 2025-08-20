@@ -54,53 +54,46 @@ class CategoryQuizRow extends StatelessWidget {
             ),
           ),
           ElevatedButton(
-            onPressed: () async {
-              if (showAddQuestionButton) {
-                // Tutor: Navigate to TutorQuestionListScreen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TutorQuestionListScreen(
-                      categoryId: categoryId,
-                      categoryTitle: title,
-                      tutorId: tutorId,
-                    ),
-                  ),
-                );
-              } else {
-                // Student: Check if there are questions available
-                if (questions <= 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content:
-                          Text('No questions available in this category yet.'),
-                      backgroundColor: Colors.orange,
-                      duration: Duration(seconds: 3),
-                    ),
-                  );
-                  return;
-                }
-
-                // Show quiz dialog if questions are available
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return QuizSummaryDialog(
-                      subject: subject,
-                      topic: title,
-                      questions: questions,
-                      time: "30mins",
-                      categoryId: categoryId,
-                      tutorId: tutorId,
+            onPressed: showAddQuestionButton
+                ? () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TutorQuestionListScreen(
+                          categoryId: categoryId,
+                          categoryTitle: title,
+                          tutorId: tutorId,
+                        ),
+                      ),
+                    );
+                  }
+                : () async {
+                    if (questions <= 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No questions available in this category yet.'),
+                          backgroundColor: Colors.orange,
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                      return;
+                    }
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return QuizSummaryDialog(
+                          subject: subject,
+                          topic: title,
+                          questions: questions,
+                          time: "30mins",
+                          categoryId: categoryId,
+                          tutorId: tutorId,
+                        );
+                      },
                     );
                   },
-                );
-              }
-            },
             style: ElevatedButton.styleFrom(
-              backgroundColor: showAddQuestionButton || questions > 0
-                  ? buttonColor
-                  : Colors.grey,
+              backgroundColor: buttonColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),

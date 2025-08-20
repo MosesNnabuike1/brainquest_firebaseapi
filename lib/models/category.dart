@@ -33,48 +33,22 @@ class QuizTopic {
 class CategoryDataProvider {
   static Future<List<CategoryData>> getCategories(String? tutorId) async {
     try {
-      print('\n=== Starting Category Fetch Process ===');
-      print('Tutor ID received: $tutorId');
-      
-      if (tutorId == null) {
-        print('Tutor ID is null, returning empty list');
-        return [];
-      }
-      
-      print('Attempting to fetch categories from Firestore...');
-      
-      // Query for categories with the exact tutor ID
-      print('Querying with tutor ID: $tutorId');
+      if (tutorId == null) return [];
       var snapshot = await FirebaseFirestore.instance
           .collection('categories')
           .where('tutorId', isEqualTo: tutorId)
-          .get()
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () {
-              print('Timeout while fetching categories');
-              throw TimeoutException('Category fetch timed out');
-            },
-          );
-          
-      print('Query results count: ${snapshot.docs.length}');
-      
-      print('Processing ${snapshot.docs.length} category documents...');
-      
-      final categories = snapshot.docs.map((doc) {
-        print('\nProcessing document:');
-        print('Document ID: ${doc.id}');
-        print('Document data: ${doc.data()}');
-        
+          .get();
+      List<CategoryData> categories = [];
+      for (var doc in snapshot.docs) {
         final data = doc.data();
-        print('\nCategory Details:');
-        print('Title: ${data['title']}');
-        print('Description: ${data['description']}');
-        print('Image Asset: ${data['imageAsset']}');
-        print('Tutor ID: ${data['tutorId']}');
-        print('Number of Questions: ${data['numberofQuestions']}');
-        
-        final category = CategoryData(
+        // Fetch actual number of questions in subcollection
+        final questionsSnap = await FirebaseFirestore.instance
+            .collection('categories')
+            .doc(doc.id)
+            .collection('questions')
+            .get();
+        final actualCount = questionsSnap.docs.length;
+        categories.add(CategoryData(
           id: doc.id,
           title: data['title'] ?? '',
           description: data['description'] ?? '',
@@ -82,27 +56,15 @@ class CategoryDataProvider {
           topics: [
             QuizTopic(
               title: data['title'] ?? '',
-              questions: data['numberofQuestions'] ?? 0,
+              questions: actualCount,
               subject: data['title'] ?? '',
             )
           ],
-        );
-        print('Created category: ${category.title} (ID: ${category.id})');
-        return category;
-      }).toList();
-      
-      print('\n=== Category Fetch Process Complete ===');
-      print('Total categories fetched: ${categories.length}');
-      
-      // Sort categories alphabetically by title
+        ));
+      }
       categories.sort((a, b) => a.title.compareTo(b.title));
-      
       return categories;
-    } catch (e, stackTrace) {
-      print('\n=== Error in Category Fetch Process ===');
-      print('Error type: ${e.runtimeType}');
-      print('Error message: $e');
-      print('Stack trace: $stackTrace');
+    } catch (e) {
       rethrow;
     }
   }

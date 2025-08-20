@@ -32,30 +32,16 @@ class _TutorIdScreenState extends State<TutorIdScreen> {
       });
 
       try {
-        // Query Firestore to check if the tutor ID exists
+        // Query Firestore to check if the tutor ID exists in tutors collection
         print('Checking tutor ID: ${_tutorIdController.text.trim()}');
-
-        // Try both string and number formats for tutor ID
         String tutorId = _tutorIdController.text.trim();
-        int? numericTutorId = int.tryParse(tutorId);
-
-        // Query for string format
-        var categoryQuery = await FirebaseFirestore.instance
-            .collection('categories')
+        var tutorQuery = await FirebaseFirestore.instance
+            .collection('tutors')
             .where('tutorId', isEqualTo: tutorId)
             .limit(1)
             .get();
 
-        // If no results and we have a numeric ID, try that format
-        if (categoryQuery.docs.isEmpty && numericTutorId != null) {
-          categoryQuery = await FirebaseFirestore.instance
-              .collection('categories')
-              .where('tutorId', isEqualTo: numericTutorId)
-              .limit(1)
-              .get();
-        }
-
-        if (categoryQuery.docs.isEmpty) {
+        if (tutorQuery.docs.isEmpty) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(

@@ -57,6 +57,34 @@ class _TutorDashboardScreenState extends State<TutorDashboardScreen> {
     }
   }
 
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+    return Card(
+      elevation: 2,
+      color: color,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 32, color: Colors.black),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _loadStats() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -87,28 +115,24 @@ class _TutorDashboardScreenState extends State<TutorDashboardScreen> {
       double averageScore = 0.0;
 
       if (tutorId != null && tutorId.isNotEmpty) {
-        final studentsQuery = await FirebaseFirestore.instance
-            .collection('users')
-            .where('tutorId', isEqualTo: tutorId)
-            .get();
-        totalStudents = studentsQuery.docs.length;
-
-        final categoriesQuery = await FirebaseFirestore.instance
-            .collection('categories')
-            .where('tutorId', isEqualTo: tutorId)
-            .get();
-        totalQuizzes = categoriesQuery.docs.length;
-
+        // Only count students who have written a quiz using this tutorId
         final resultsQuery = await FirebaseFirestore.instance
             .collection('quiz_results')
             .where('tutorId', isEqualTo: tutorId)
             .get();
 
+        // Get unique student IDs from quiz_results
+        final studentIds = <String>{};
         double totalScore = 0;
         int totalResults = 0;
 
         for (var doc in resultsQuery.docs) {
           final data = doc.data();
+          final studentId = data['studentId'];
+          // Only count non-null, non-empty student IDs
+          if (studentId != null && studentId is String && studentId.trim().isNotEmpty) {
+            studentIds.add(studentId.trim());
+          }
           final correctAnswers = data['correctAnswers'] ?? 0;
           final totalQuestions = data['totalQuestions'] ?? 1;
           if (totalQuestions > 0) {
@@ -116,8 +140,25 @@ class _TutorDashboardScreenState extends State<TutorDashboardScreen> {
             totalResults++;
           }
         }
-
+        // If no valid student IDs, totalStudents should be 0
+        totalStudents = studentIds.isEmpty ? 0 : studentIds.length;
         averageScore = totalResults > 0 ? totalScore / totalResults : 0.0;
+
+        // Count total quiz questions created by this tutor
+        final categoriesQuery = await FirebaseFirestore.instance
+            .collection('categories')
+            .where('tutorId', isEqualTo: tutorId)
+            .get();
+        int totalQuizQuestions = 0;
+        for (var catDoc in categoriesQuery.docs) {
+          final questionsSnap = await FirebaseFirestore.instance
+              .collection('categories')
+              .doc(catDoc.id)
+              .collection('questions')
+              .get();
+          totalQuizQuestions += questionsSnap.docs.length;
+        }
+        totalQuizzes = totalQuizQuestions;
       }
 
       if (!mounted) return;
@@ -142,169 +183,19 @@ class _TutorDashboardScreenState extends State<TutorDashboardScreen> {
     }
   }
 
-  void _showUpdatePasscodeDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        int selectedOption = 0; // 0 = Tutor ID, 1 = Password
-        final idController = TextEditingController();
-        final passwordController = TextEditingController();
-        final confirmPasswordController = TextEditingController();
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Update Passcode'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    children: [
-                      RadioListTile<int>(
-                        value: 0,
-                        groupValue: selectedOption,
-                        onChanged: (val) => setState(() => selectedOption = val ?? 0),
-                        title: const Text('Change Tutor ID'),
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                      RadioListTile<int>(
-                        value: 1,
-                        groupValue: selectedOption,
-                        onChanged: (val) => setState(() => selectedOption = val ?? 0),
-                        title: const Text('Change Password'),
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  if (selectedOption == 0) ...[
-                    const Text('New Tutor ID'),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: idController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter new Tutor ID',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ] else ...[
-                    const Text('New Password'),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter new password',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text('Confirm Password'),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: confirmPasswordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        hintText: 'Re-enter new password',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-              actions: [
-                TextButton(
-                  child: const Text('Cancel'),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                TextButton(
-                  child: const Text('Update'),
-                  onPressed: () async {
-                    if (selectedOption == 0) {
-                      final newId = idController.text.trim();
-                      if (newId.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Tutor ID cannot be empty.'),
-                              backgroundColor: Colors.red),
-                        );
-                        return;
-                      }
-                      try {
-                        final user = FirebaseAuth.instance.currentUser;
-                        if (user == null) throw Exception('Not logged in');
-                        await FirebaseFirestore.instance
-                            .collection('tutors')
-                            .doc(user.uid)
-                            .update({'tutorId': newId});
-                        Navigator.pop(context);
-                        setState(() {
-                          _tutorId = newId;
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Tutor ID updated!'),
-                              backgroundColor: Colors.green),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text('Failed to update Tutor ID: $e'),
-                              backgroundColor: Colors.red),
-                        );
-                      }
-                    } else {
-                      final newPass = passwordController.text.trim();
-                      final confirmPass = confirmPasswordController.text.trim();
-                      if (newPass.isEmpty || confirmPass.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Password fields cannot be empty.'),
-                              backgroundColor: Colors.red),
-                        );
-                        return;
-                      }
-                      if (newPass != confirmPass) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Passwords do not match.'),
-                              backgroundColor: Colors.red),
-                        );
-                        return;
-                      }
-                      if (newPass.length < 6) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Password must be at least 6 characters.'),
-                              backgroundColor: Colors.red),
-                        );
-                        return;
-                      }
-                      try {
-                        final user = FirebaseAuth.instance.currentUser;
-                        if (user == null) throw Exception('Not logged in');
-                        await user.updatePassword(newPass);
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Password updated!'),
-                              backgroundColor: Colors.green),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text('Failed to update password: $e'),
-                              backgroundColor: Colors.red),
-                        );
-                      }
-                    }
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      },
+  // ...existing code...
+  Widget _buildQuickActionCard(String title, IconData icon, Color color, VoidCallback onTap) {
+    return Card(
+      elevation: 2,
+      color: color,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.black, size: 28),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        onTap: onTap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        tileColor: color,
+      ),
     );
   }
 
@@ -386,12 +277,17 @@ class _TutorDashboardScreenState extends State<TutorDashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Removed motivational text
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 4,
                       children: [
                         const Text('Your Tutor ID:', style: TextStyle(fontWeight: FontWeight.bold)),
-                        const SizedBox(width: 8),
-                        SelectableText(_tutorId ?? '', style: const TextStyle(fontSize: 16, color: Colors.blue)),
-                        const SizedBox(width: 8),
+                        SelectableText(
+                          _tutorId ?? '',
+                          style: const TextStyle(fontSize: 16, color: Colors.blue),
+                          maxLines: 2,
+                        ),
                         Builder(
                           builder: (context) {
                             return IconButton(
@@ -425,15 +321,15 @@ class _TutorDashboardScreenState extends State<TutorDashboardScreen> {
                               'Total Students',
                               _stats['totalStudents'].toString(),
                               Icons.people,
-                              const Color.fromRGBO(204, 204, 204, 1),
+                              const Color.fromRGBO(154, 207, 247, 1), // original color
                             ),
                           ),
                           Expanded(
                             child: _buildStatCard(
-                              'Total Quiz',
+                              'Total Quiz Questions', // label split for equal height
                               _stats['totalQuizzes'].toString(),
                               Icons.quiz,
-                              const Color.fromRGBO(204, 204, 204, 1),
+                              const Color.fromRGBO(255, 186, 49, 1), // original color
                             ),
                           ),
                           Expanded(
@@ -441,7 +337,7 @@ class _TutorDashboardScreenState extends State<TutorDashboardScreen> {
                               'Average Score',
                               '${_stats['averageScore'].toStringAsFixed(1)}%',
                               _stats['averageScore'] >= 70 ? Icons.thumb_up : Icons.thumb_down,
-                              const Color.fromRGBO(204, 204, 204, 1),
+                              const Color.fromRGBO(253, 126, 125, 1), // original color
                             ),
                           ),
                         ],
@@ -521,178 +417,13 @@ class _TutorDashboardScreenState extends State<TutorDashboardScreen> {
                           },
                         ),
                         const SizedBox(height: 2),
-                        _buildQuickActionCard(
-                          'Update Passcode',
-                          Icons.lock,
-                          const Color.fromRGBO(253, 126, 125, 1),
-                          _showUpdatePasscodeDialog,
-                        ),
-                        const SizedBox(height: 2),
+                        // Removed Update Passcode quick action
                       ],
                     ),
-                    const SizedBox(height: 32),
-                    const Text(
-                      "Feedback Received",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                    const SizedBox(height: 14),
-                    _tutorId == null
-                        ? const Center(child: CircularProgressIndicator())
-                        : FutureBuilder<QuerySnapshot>(
-                            future: FirebaseFirestore.instance
-                                .collection('feedback')
-                                .where('tutorId', isEqualTo: _tutorId)
-                                .orderBy('timestamp', descending: true)
-                                .get(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(child: CircularProgressIndicator());
-                              } else if (snapshot.hasError) {
-                                return const Text('Error loading feedback', style: TextStyle(color: Colors.red));
-                              } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                return const Text('No feedback received', style: TextStyle(fontSize: 15, color: Colors.black54));
-                              }
-                              final feedbackDocs = snapshot.data!.docs;
-                              return Column(
-                                children: feedbackDocs.map((doc) {
-                                  final data = doc.data() as Map<String, dynamic>;
-                                  final title = data['title'] ?? 'Feedback';
-                                  final content = data['content'] ?? '';
-                                  final author = data['studentName'] ?? 'Anonymous';
-                                  final timestamp = data['timestamp'] != null && data['timestamp'] is Timestamp
-                                      ? (data['timestamp'] as Timestamp).toDate()
-                                      : null;
-                                  String timeAgo = '';
-                                  if (timestamp != null) {
-                                    final now = DateTime.now();
-                                    final diff = now.difference(timestamp);
-                                    if (diff.inSeconds < 60) {
-                                      timeAgo = '${diff.inSeconds}s ago';
-                                    } else if (diff.inMinutes < 60) {
-                                      timeAgo = '${diff.inMinutes}m ago';
-                                    } else if (diff.inHours < 24) {
-                                      timeAgo = '${diff.inHours}h ago';
-                                    } else if (diff.inDays < 7) {
-                                      timeAgo = '${diff.inDays}d ago';
-                                    } else {
-                                      timeAgo = '${timestamp.day}/${timestamp.month}/${timestamp.year}';
-                                    }
-                                  }
-                                  return Column(
-                                    children: [
-                                      _buildFeedbackCard(title, content, author, timeAgo),
-                                      const SizedBox(height: 12),
-                                    ],
-                                  );
-                                }).toList(),
-                              );
-                            },
-                          ),
+  // ...existing code...
                   ],
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return AspectRatio(
-      aspectRatio: 1.0,
-      child: Card(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Color.fromRGBO(0, 0, 0, 0.1), width: 1),
-        ),
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                value,
-                style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black87),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 2),
-              Text(
-                title,
-                style: const TextStyle(fontSize: 14, color: Colors.black54),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickActionCard(String title, IconData icon, Color color, VoidCallback onTap) {
-    return Card(
-      color: color,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      elevation: 0,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-              Icon(icon, color: Colors.black, size: 24),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFeedbackCard(String title, String content, String author, String time) {
-    return Card(
-      color: const Color.fromRGBO(250, 250, 250, 1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              content,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  author,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.black54),
-                ),
-                Text(
-                  time,
-                  style: const TextStyle(fontSize: 12, color: Colors.black54),
-                ),
-              ],
             ),
           ],
         ),

@@ -1,10 +1,12 @@
-import 'logout_drawer.dart';
+
+
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'logout_drawer.dart';
 import 'package:firebase_quizzapp/student/widgets/fixed_header.dart';
 import 'achievements_screen.dart';
 import 'daily_quiz_screen.dart';
-
-import 'feedback_dialog.dart';
 
 class StudentDashboardScreen extends StatefulWidget {
   final String studentName;
@@ -21,6 +23,36 @@ class StudentDashboardScreen extends StatefulWidget {
 }
 
 class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
+  User? get _user => FirebaseAuth.instance.currentUser;
+  Future<List<Map<String, dynamic>>> _loadRecentActivities() async {
+    if (_user == null) return [];
+    final activities = <Map<String, dynamic>>[];
+    final quizResultsSnap = await FirebaseFirestore.instance
+        .collection('quiz_results')
+        .where('studentId', isEqualTo: _user!.uid)
+        .orderBy('timestamp', descending: true)
+        .limit(5)
+        .get();
+    for (var doc in quizResultsSnap.docs) {
+      final data = doc.data();
+      final timestamp = (data['timestamp'] as Timestamp).toDate();
+      final score = (data['correctAnswers'] ?? 0) as int;
+      final total = (data['totalQuestions'] ?? 1) as int;
+      activities.add({
+        'title': '${data['subject']} Quiz completed',
+        'subtitle': '$score/$total correct • ${_formatTimeAgo(timestamp)}',
+        'timestamp': timestamp,
+      });
+    }
+    return activities;
+  }
+  String _formatTimeAgo(DateTime date) {
+    final now = DateTime.now();
+    final diff = now.difference(date);
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${diff.inDays}d ago';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +90,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                   children: [
                     // Welcome Texts
                     Text(
-                      "Welcome, "+widget.studentName,
+                      "Welcome, ${widget.studentName}",
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -102,15 +134,15 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           );
                         },
                         borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
+                        child: const Padding(
+                          padding: EdgeInsets.all(20),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       "Daily Quiz",
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -118,9 +150,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                         color: Colors.black,
                                       ),
                                     ),
-                                    const SizedBox(height: 0),
+                                    SizedBox(height: 0),
                                     // You may want to restore the FutureBuilder for quiz count here
-                                    const Text(
+                                    Text(
                                       "10 questions daily",
                                       style: TextStyle(
                                           fontSize: 13,
@@ -129,7 +161,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                   ],
                                 ),
                               ),
-                              const Icon(Icons.chevron_right,
+                              Icon(Icons.chevron_right,
                                   color: Colors.black54, size: 20),
                             ],
                           ),
@@ -148,15 +180,15 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           // Add navigation or logic for critical thinking
                         },
                         borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
+                        child: const Padding(
+                          padding: EdgeInsets.all(20),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       "Critical Thinking",
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -164,9 +196,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                         color: Colors.black,
                                       ),
                                     ),
-                                    const SizedBox(height: 0),
+                                    SizedBox(height: 0),
                                     // You may want to restore the FutureBuilder for puzzle count here
-                                    const Text(
+                                    Text(
                                       "Puzzles available",
                                       style: TextStyle(
                                           fontSize: 13,
@@ -175,7 +207,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                   ],
                                 ),
                               ),
-                              const Icon(Icons.chevron_right, color: Colors.black54, size: 20),
+                              Icon(Icons.chevron_right, color: Colors.black54, size: 20),
                             ],
                           ),
                         ),
@@ -200,15 +232,15 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           );
                         },
                         borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
+                        child: const Padding(
+                          padding: EdgeInsets.all(20),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       "Achievements",
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -216,9 +248,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                         color: Colors.black,
                                       ),
                                     ),
-                                    const SizedBox(height: 0),
+                                    SizedBox(height: 0),
                                     // You may want to restore the FutureBuilder for achievements count here
-                                    const Text(
+                                    Text(
                                       "Badges earned",
                                       style: TextStyle(
                                           fontSize: 13,
@@ -227,7 +259,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                                   ],
                                 ),
                               ),
-                              const Icon(Icons.chevron_right,
+                              Icon(Icons.chevron_right,
                                   color: Colors.black54, size: 20),
                             ],
                           ),
@@ -246,45 +278,54 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                     ),
                     const SizedBox(height: 14),
                     // Recent Activity Container
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF8F8FC),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 0),
-                      child: const Column(
-                        children: [
-                          // Example activity
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20.0),
-                            child: Row(
-                              children: [
-                                Icon(Icons.check_circle, size: 20, color: Colors.green),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    "Completed Daily Quiz",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.black87,
+                    FutureBuilder<List<Map<String, dynamic>>>(
+                      future: _loadRecentActivities(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final activities = snapshot.data ?? [];
+                        if (activities.isEmpty) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8F8FC),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 0),
+                            child: const Center(
+                              child: Text('No recent activities yet.', style: TextStyle(fontSize: 14, color: Colors.black54)),
+                            ),
+                          );
+                        }
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8F8FC),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 0),
+                          child: Column(
+                            children: activities.map((activity) => Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.check_circle, size: 20, color: Colors.green),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      activity['title'],
+                                      style: const TextStyle(fontSize: 13, color: Colors.black87),
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  "2h ago",
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.black54,
+                                  Text(
+                                    activity['subtitle'],
+                                    style: const TextStyle(fontSize: 11, color: Colors.black54),
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                            )).toList(),
                           ),
-                          // Add more activities as needed
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -293,23 +334,23 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
           ],
         ),
       ),
-      floatingActionButton: widget.tutorId != null
-          ? FloatingActionButton.extended(
-              onPressed: () async {
-                final result = await showDialog(
-                  context: context,
-                  builder: (context) => FeedbackDialog(tutorId: widget.tutorId!),
-                );
-                if (result == true && mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Feedback sent!'), backgroundColor: Colors.green),
-                  );
-                }
-              },
-              icon: const Icon(Icons.feedback),
-              label: const Text('Send Feedback'),
-            )
-          : null,
+      // floatingActionButton: widget.tutorId != null
+      //     ? FloatingActionButton.extended(
+      //         onPressed: () async {
+      //           final result = await showDialog(
+      //             context: context,
+      //             builder: (context) => FeedbackDialog(tutorId: widget.tutorId!),
+      //           );
+      //           if (result == true && mounted) {
+      //             ScaffoldMessenger.of(context).showSnackBar(
+      //               const SnackBar(content: Text('Feedback sent!'), backgroundColor: Colors.green),
+      //             );
+      //           }
+      //         },
+      //         icon: const Icon(Icons.feedback),
+      //         label: const Text('Send Feedback'),
+      //       )
+      //     : null,
     );
   }
 }
