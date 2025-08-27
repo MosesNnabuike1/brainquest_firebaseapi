@@ -6,10 +6,10 @@ import 'widgets/answer_overlay.dart';
 import 'widgets/question_header.dart';
 import 'package:flutter/material.dart';
 import 'widgets/question_provider.dart';
-import 'widgets/general_button_widget.dart';
 import 'widgets/quiz_completion_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 /// A widget that displays a quiz question with multiple choice options
 class QuestionPage extends StatefulWidget {
@@ -78,12 +78,13 @@ class _QuestionPageState extends State<QuestionPage>
       });
 
       // Fetch questions from the provider
-      final allQuestions = await QuestionProvider.getQuestions(widget.categoryId);
+      final allQuestions =
+          await QuestionProvider.getQuestions(widget.categoryId);
 
       // Randomize question order and options
       final random = Random();
       allQuestions.shuffle(random);
-      
+
       // Shuffle options for each question
       for (var question in allQuestions) {
         final correctOption = question.correctOption;
@@ -317,7 +318,9 @@ class _QuestionPageState extends State<QuestionPage>
                       text: _selectedOption != null
                           ? (isLastQuestion ? "Submit" : "Submit")
                           : "Submit",
-                      onPressed: _selectedOption != null && !_showCorrectOverlay ? _onSubmit : null,
+                      onPressed: _selectedOption != null && !_showCorrectOverlay
+                          ? _onSubmit
+                          : null,
                       enabled: _selectedOption != null && !_showCorrectOverlay,
                     ),
                   ],

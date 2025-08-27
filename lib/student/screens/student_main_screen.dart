@@ -1,9 +1,9 @@
-import 'profile_page.dart';
-import 'common_bottom_nav.dart';
-import 'student_category_screen.dart';
+import '../common_bottom_nav.dart';
 import 'package:flutter/material.dart';
-import 'student_dashboard_screen.dart';
-import 'results/quiz_results_page.dart';
+import '../results/quiz_results_page.dart';
+import 'package:firebase_quizzapp/student/screens/profile_page.dart';
+import 'package:firebase_quizzapp/student/screens/student_category_screen.dart';
+import 'package:firebase_quizzapp/student/screens/student_dashboard_screen.dart';
 
 class StudentMainScreen extends StatefulWidget {
   final String studentName;

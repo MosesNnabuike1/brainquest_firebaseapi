@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class AddQuestionScreen extends StatefulWidget {
   final String? tutorId;
@@ -40,7 +40,9 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.tutorId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Tutor ID is missing!'), backgroundColor: Colors.red),
+          const SnackBar(
+              content: Text('Tutor ID is missing!'),
+              backgroundColor: Colors.red),
         );
         Navigator.pop(context);
         return;
@@ -89,7 +91,10 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
         categories = categories.where((cat) {
           final title = cat['title'].toString().toLowerCase();
           final subject = cat['subject'].toString().toLowerCase();
-          return title.contains('language') || title.contains('english') || subject.contains('language') || subject.contains('english');
+          return title.contains('language') ||
+              title.contains('english') ||
+              subject.contains('language') ||
+              subject.contains('english');
         }).toList();
       }
 
@@ -259,7 +264,8 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
         labelText: label,
         hintText: hint,
         border: const OutlineInputBorder(),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
       minLines: minLines,
       maxLines: maxLines,
@@ -393,4 +399,4 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
       ),
     );
   }
-} 
+}

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -289,8 +290,8 @@ class _ProfilePageState extends State<ProfilePage> {
           Navigator.pop(context);
           await _auth.signOut();
           if (mounted) {
-            Navigator.of(context)
-                .pushNamedAndRemoveUntil('/', (route) => false);
+            if (!context.mounted) return;
+            context.go('/');
           }
         },
         backgroundColor: const Color(0xFF181DB4),

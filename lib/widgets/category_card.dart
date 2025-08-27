@@ -1,6 +1,6 @@
-import 'category_quiz_row.dart';
-import '../../models/category.dart';
+import '../models/category.dart';
 import 'package:flutter/material.dart';
+import '../student/widgets/category_quiz_row.dart';
 
 class CategoryCard extends StatelessWidget {
   final CategoryData category;
@@ -20,9 +20,7 @@ class CategoryCard extends StatelessWidget {
     this.isTutor = false,
   }) : super(key: key);
 
-  // Helper to convert Google Drive share link to direct link
   String _convertGoogleDriveLink(String url) {
-    // First, try to extract file ID using a more flexible approach
     if (url.contains('drive.google.com/file/d/')) {
       final fileIdMatch = RegExp(r'/file/d/([a-zA-Z0-9_-]+)').firstMatch(url);
       if (fileIdMatch != null) {
@@ -33,7 +31,6 @@ class CategoryCard extends StatelessWidget {
       }
     }
 
-    // Handle different Google Drive URL formats as fallback
     final patterns = [
       RegExp(r'drive\.google\.com\/file\/d\/([\w-]+)\/view\?usp=drive_link'),
       RegExp(r'drive\.google\.com\/file\/d\/([\w-]+)\/view'),

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_quizzapp/student/tutor_id_screen.dart';
 import 'package:firebase_quizzapp/widgets/cancel_icon_widget.dart';
-import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
-import 'package:firebase_quizzapp/student/auth/student_forgot_password_screen.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -122,15 +121,10 @@ class _LoginScreenState extends State<LoginScreen> {
           _isLoading = false;
           _errorMessage = null;
         });
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TutorIdScreen(
-              studentName: userDoc.data()?['fullName'] ?? email.split('@')[0],
-            ),
-          ),
-          (route) => false,
-        );
+        context.go('/home', extra: {
+          'studentName': userDoc.data()?['fullName'] ?? email.split('@')[0],
+          'tutorId': null, // Students will need to enter tutor ID later
+        });
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
@@ -156,10 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _navigateToForgotPassword() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
-    );
+    context.push('/forgot-password');
   }
 
   @override
@@ -184,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 24,
                       ),
                       CancelIconWidget(
-                        onTap: () => Navigator.of(context).pop(),
+                        onTap: () => context.pop(),
                         rightPadding: 0,
                         size: 18,
                         color: const Color.fromARGB(137, 0, 0, 0),
@@ -342,7 +333,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   Center(
                     child: TextButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/register');
+                        if (!context.mounted) return;
+                        context.go('/register');
                       },
                       child: const Text(
                         'Don\'t have an account? SIGNUP',

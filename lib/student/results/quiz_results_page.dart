@@ -1,6 +1,6 @@
-import 'quiz_history_page.dart';
 import '../../models/quiz_result.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_quizzapp/student/widgets/fixed_header.dart';
@@ -14,7 +14,6 @@ class QuizResultsPage extends StatefulWidget {
 
 class _QuizResultsPageState extends State<QuizResultsPage> {
   bool _initialLoading = true;
-
 
   @override
   Widget build(BuildContext context) {
@@ -111,13 +110,9 @@ class _QuizResultsPageState extends State<QuizResultsPage> {
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(8),
                                     onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              QuizHistoryPage(resultId: doc.id),
-                                        ),
-                                      );
+                                      context.push('/quiz-history', extra: {
+                                        'resultId': doc.id,
+                                      });
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.all(16),

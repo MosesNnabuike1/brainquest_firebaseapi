@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:firebase_quizzapp/models/student_details.dart';
+import 'package:firebase_quizzapp/student/models/student_details.dart';
 import 'package:firebase_quizzapp/widgets/cancel_icon_widget.dart';
-import 'package:firebase_quizzapp/student/auth/student_login_screen.dart';
-import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class StudentRegistrationScreen extends StatefulWidget {
   const StudentRegistrationScreen({super.key});
@@ -129,7 +129,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
               .set({
             'fullName': _usernameController.text.trim(),
             'email': _emailController.text.trim(),
-            'role': 'student', 
+            'role': 'student',
             'createdAt': Timestamp.now(),
           });
 
@@ -147,13 +147,10 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                          (route) => false,
-                        );
+                        context.go('/home', extra: {
+                          'studentName': _usernameController.text.trim(),
+                          'tutorId': null,
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
@@ -307,7 +304,8 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                     TextFormField(
                       controller: _usernameController,
                       decoration: InputDecoration(
-                        hintText: 'Type your full name as it appears on your ID',
+                        hintText:
+                            'Type your full name as it appears on your ID',
                         hintStyle: const TextStyle(
                           color: Colors.black54,
                           fontWeight: FontWeight.normal,
@@ -360,7 +358,8 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                     TextFormField(
                       controller: _passwordController,
                       decoration: InputDecoration(
-                        hintText: 'Choose a strong password (min. 6 characters)',
+                        hintText:
+                            'Choose a strong password (min. 6 characters)',
                         hintStyle: const TextStyle(
                           color: Colors.black54,
                           fontWeight: FontWeight.normal,
@@ -432,12 +431,10 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                     const SizedBox(height: 0),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                        );
+                        context.go('/home', extra: {
+                          'studentName': _usernameController.text.trim(),
+                          'tutorId': null,
+                        });
                       },
                       child: const Center(
                         child: Text(

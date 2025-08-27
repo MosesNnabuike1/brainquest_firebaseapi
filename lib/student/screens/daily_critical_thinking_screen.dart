@@ -1,19 +1,21 @@
 import 'dart:math';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'widgets/general_button_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class DailyCriticalThinkingScreen extends StatefulWidget {
   final String? tutorId;
   const DailyCriticalThinkingScreen({Key? key, this.tutorId}) : super(key: key);
 
   @override
-  State<DailyCriticalThinkingScreen> createState() => _DailyCriticalThinkingScreenState();
+  State<DailyCriticalThinkingScreen> createState() =>
+      _DailyCriticalThinkingScreenState();
 }
 
-class _DailyCriticalThinkingScreenState extends State<DailyCriticalThinkingScreen> {
+class _DailyCriticalThinkingScreenState
+    extends State<DailyCriticalThinkingScreen> {
   bool _isLoading = true;
   String? _error;
   Map<String, dynamic>? _puzzle;
@@ -31,10 +33,16 @@ class _DailyCriticalThinkingScreenState extends State<DailyCriticalThinkingScree
   }
 
   Future<void> _loadPuzzleAndStreak() async {
-    setState(() { _isLoading = true; _error = null; });
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
     try {
       if (widget.tutorId == null || _user == null) {
-        setState(() { _error = 'Tutor ID or user not found.'; _isLoading = false; });
+        setState(() {
+          _error = 'Tutor ID or user not found.';
+          _isLoading = false;
+        });
         return;
       }
       // Fetch all categories for this tutor
@@ -52,12 +60,16 @@ class _DailyCriticalThinkingScreenState extends State<DailyCriticalThinkingScree
         allPuzzles.addAll(puzzlesSnap.docs.map((q) => q.data()));
       }
       if (allPuzzles.isEmpty) {
-        setState(() { _error = 'No logic puzzles found for your tutor.'; _isLoading = false; });
+        setState(() {
+          _error = 'No logic puzzles found for your tutor.';
+          _isLoading = false;
+        });
         return;
       }
       // Deterministically pick one for today
       final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      allPuzzles.sort((a, b) => a['question'].hashCode.compareTo(b['question'].hashCode));
+      allPuzzles.sort(
+          (a, b) => a['question'].hashCode.compareTo(b['question'].hashCode));
       final seed = today.hashCode ^ widget.tutorId.hashCode;
       final random = Random(seed);
       allPuzzles.shuffle(random);
@@ -73,7 +85,10 @@ class _DailyCriticalThinkingScreenState extends State<DailyCriticalThinkingScree
         _badge = _getBadgeForStreak(streak);
       });
     } catch (e) {
-      setState(() { _error = 'Error loading puzzle: $e'; _isLoading = false; });
+      setState(() {
+        _error = 'Error loading puzzle: $e';
+        _isLoading = false;
+      });
     }
   }
 
@@ -170,12 +185,15 @@ class _DailyCriticalThinkingScreenState extends State<DailyCriticalThinkingScree
           child: ListView(
             shrinkWrap: true,
             children: [
-              const Text('Attempt History', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const Text('Attempt History',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               ...attemptsSnap.docs.map((doc) {
                 final data = doc.data();
                 return Card(
-                  color: data['isCorrect'] == true ? Colors.green[50] : Colors.red[50],
+                  color: data['isCorrect'] == true
+                      ? Colors.green[50]
+                      : Colors.red[50],
                   child: ListTile(
                     title: Text(data['question'] ?? ''),
                     subtitle: Column(
@@ -226,36 +244,52 @@ class _DailyCriticalThinkingScreenState extends State<DailyCriticalThinkingScree
                   ? const Center(child: Text('No puzzle for today.'))
                   : SafeArea(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 18),
                         child: SingleChildScrollView(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Row(
                                 children: [
-                                  Text('Streak: $_streak', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                  Text('Streak: $_streak',
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
                                   if (_badge != null) ...[
                                     const SizedBox(width: 10),
-                                    const Icon(Icons.emoji_events, color: Colors.amber, size: 28),
-                                    Text(_badge!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.amber)),
+                                    const Icon(Icons.emoji_events,
+                                        color: Colors.amber, size: 28),
+                                    Text(_badge!,
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.amber)),
                                   ],
                                 ],
                               ),
                               const SizedBox(height: 16),
                               Container(
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: const Color(0xFFFFBA31), width: 1),
+                                  border: Border.all(
+                                      color: const Color(0xFFFFBA31), width: 1),
                                   borderRadius: BorderRadius.circular(18),
                                   color: Colors.white,
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 24, horizontal: 16),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
                                     children: [
-                                      const Text('Today\'s Logic Puzzle:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                      const Text('Today\'s Logic Puzzle:',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold)),
                                       const SizedBox(height: 18),
-                                      Text(_puzzle!['question'] ?? '', style: const TextStyle(fontSize: 18)),
+                                      Text(_puzzle!['question'] ?? '',
+                                          style: const TextStyle(fontSize: 18)),
                                     ],
                                   ),
                                 ),
@@ -269,21 +303,22 @@ class _DailyCriticalThinkingScreenState extends State<DailyCriticalThinkingScree
                                   _puzzle?['optionD'],
                                 ];
                                 final isSelected = _selectedOption == i;
-                                final isCorrect = options[i] == _puzzle?['correctAnswer'];
+                                final isCorrect =
+                                    options[i] == _puzzle?['correctAnswer'];
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 12),
                                   child: GestureDetector(
                                     onTap: () => _onOptionTap(i),
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16, horizontal: 18),
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? (isCorrect && _answered
                                                 ? Colors.green[100]
                                                 : (!isCorrect && _answered
                                                     ? Colors.red[100]
-                                                    : Colors.blue[50])
-                                              )
+                                                    : Colors.blue[50]))
                                             : Colors.white,
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
@@ -299,14 +334,20 @@ class _DailyCriticalThinkingScreenState extends State<DailyCriticalThinkingScree
                                       ),
                                       child: Row(
                                         children: [
-                                          Text('${String.fromCharCode(65 + i)}.', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                          Text(
+                                              '${String.fromCharCode(65 + i)}.',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16)),
                                           const SizedBox(width: 12),
                                           Expanded(
                                             child: Text(
                                               options[i] ?? '',
                                               style: TextStyle(
                                                 color: Colors.black,
-                                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                                fontWeight: isSelected
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
                                                 fontSize: 16,
                                               ),
                                             ),
@@ -324,27 +365,43 @@ class _DailyCriticalThinkingScreenState extends State<DailyCriticalThinkingScree
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: _isCorrect ? Colors.green : Colors.red,
+                                      color: _isCorrect
+                                          ? Colors.green
+                                          : Colors.red,
                                       width: 2,
                                     ),
                                   ),
                                   padding: const EdgeInsets.all(16),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        _isCorrect ? 'Correct! 🎉' : 'Incorrect.',
+                                        _isCorrect
+                                            ? 'Correct! 🎉'
+                                            : 'Incorrect.',
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: _isCorrect ? Colors.green : Colors.red,
+                                          color: _isCorrect
+                                              ? Colors.green
+                                              : Colors.red,
                                         ),
                                       ),
                                       const SizedBox(height: 12),
-                                      Text('Answer: ${_puzzle!['correctAnswer'] ?? ''}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.green)),
+                                      Text(
+                                          'Answer: ${_puzzle!['correctAnswer'] ?? ''}',
+                                          style: const TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.green)),
                                       const SizedBox(height: 12),
-                                      if ((_puzzle!['explanation'] ?? '').isNotEmpty)
-                                        Text('Explanation: ${_puzzle!['explanation']}', style: const TextStyle(fontSize: 16)),
+                                      if ((_puzzle!['explanation'] ?? '')
+                                          .isNotEmpty)
+                                        Text(
+                                            'Explanation: ${_puzzle!['explanation']}',
+                                            style:
+                                                const TextStyle(fontSize: 16)),
                                     ],
                                   ),
                                 ),
@@ -361,4 +418,4 @@ class _DailyCriticalThinkingScreenState extends State<DailyCriticalThinkingScree
                     ),
     );
   }
-} 
+}

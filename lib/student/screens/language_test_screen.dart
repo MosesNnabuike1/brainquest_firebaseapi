@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'widgets/general_button_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class LanguageTestScreen extends StatefulWidget {
   const LanguageTestScreen({Key? key}) : super(key: key);
@@ -43,11 +43,17 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
   }
 
   Future<void> _loadQuestionAndStreak() async {
-    setState(() { _isLoading = true; _error = null; });
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
     try {
       final tutorId = _tutorId;
       if (tutorId == null || _user == null) {
-        setState(() { _error = 'Tutor ID or user not found.'; _isLoading = false; });
+        setState(() {
+          _error = 'Tutor ID or user not found.';
+          _isLoading = false;
+        });
         return;
       }
       // Fetch all language categories for this tutor
@@ -58,10 +64,17 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
       List<Map<String, dynamic>> allQuestions = [];
       for (var catDoc in categoriesSnap.docs) {
         final data = catDoc.data();
-        final isLanguage = (data['name']?.toString().toLowerCase().contains('language') ?? false) ||
-                          (data['subject']?.toString().toLowerCase().contains('language') ?? false) ||
-                          (data['name']?.toString().toLowerCase().contains('english') ?? false) ||
-                          (data['subject']?.toString().toLowerCase().contains('english') ?? false);
+        final isLanguage = (data['name']
+                    ?.toString()
+                    .toLowerCase()
+                    .contains('language') ??
+                false) ||
+            (data['subject']?.toString().toLowerCase().contains('language') ??
+                false) ||
+            (data['name']?.toString().toLowerCase().contains('english') ??
+                false) ||
+            (data['subject']?.toString().toLowerCase().contains('english') ??
+                false);
         if (isLanguage) {
           final questionsSnap = await FirebaseFirestore.instance
               .collection('categories')
@@ -72,12 +85,16 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
         }
       }
       if (allQuestions.isEmpty) {
-        setState(() { _error = 'No language questions found for your tutor.'; _isLoading = false; });
+        setState(() {
+          _error = 'No language questions found for your tutor.';
+          _isLoading = false;
+        });
         return;
       }
       // Deterministically pick one for today
       final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      allQuestions.sort((a, b) => a['questions'].hashCode.compareTo(b['questions'].hashCode));
+      allQuestions.sort(
+          (a, b) => a['questions'].hashCode.compareTo(b['questions'].hashCode));
       final seed = today.hashCode ^ tutorId.hashCode;
       final random = Random(seed);
       allQuestions.shuffle(random);
@@ -92,7 +109,10 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
         _badge = _getBadgeForStreak(streak);
       });
     } catch (e) {
-      setState(() { _error = 'Error loading language test: $e'; _isLoading = false; });
+      setState(() {
+        _error = 'Error loading language test: $e';
+        _isLoading = false;
+      });
     }
   }
 
@@ -184,24 +204,28 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
       context: context,
       isScrollControlled: true,
       builder: (context) {
-                    return Padding(
+        return Padding(
           padding: const EdgeInsets.all(20),
           child: ListView(
             shrinkWrap: true,
-        children: [
-              const Text('Attempt History', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
+            children: [
+              const Text('Attempt History',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
               ...attemptsSnap.docs.map((doc) {
                 final data = doc.data();
                 return Card(
-                  color: data['isCorrect'] == true ? Colors.green[50] : Colors.red[50],
+                  color: data['isCorrect'] == true
+                      ? Colors.green[50]
+                      : Colors.red[50],
                   child: ListTile(
                     title: Text(data['question'] ?? ''),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Your answer:  ${data['selectedValue'] ?? '-'}'),
-                        Text('Correct answer:  ${data['correctAnswer'] ?? '-'}'),
+                        Text(
+                            'Correct answer:  ${data['correctAnswer'] ?? '-'}'),
                         if ((data['explanation'] ?? '').isNotEmpty)
                           Text('Explanation:  ${data['explanation']}'),
                         Text('Date:  ${data['date'] ?? ''}'),
@@ -245,36 +269,52 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
                   ? const Center(child: Text('No question for today.'))
                   : SafeArea(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 18),
                         child: SingleChildScrollView(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Row(
                                 children: [
-                                  Text('Streak: $_streak', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                  Text('Streak: $_streak',
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
                                   if (_badge != null) ...[
                                     const SizedBox(width: 10),
-                                    const Icon(Icons.emoji_events, color: Colors.amber, size: 28),
-                                    Text(_badge!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.amber)),
+                                    const Icon(Icons.emoji_events,
+                                        color: Colors.amber, size: 28),
+                                    Text(_badge!,
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.amber)),
                                   ],
                                 ],
                               ),
                               const SizedBox(height: 16),
                               Container(
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: const Color(0xFFFD7E7D), width: 1),
+                                  border: Border.all(
+                                      color: const Color(0xFFFD7E7D), width: 1),
                                   borderRadius: BorderRadius.circular(18),
                                   color: Colors.white,
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 24, horizontal: 16),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
                                     children: [
-                                      const Text('Today\'s Language Question:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                      const Text('Today\'s Language Question:',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold)),
                                       const SizedBox(height: 18),
-                                      Text(_question!['questions'] ?? '', style: const TextStyle(fontSize: 18)),
+                                      Text(_question!['questions'] ?? '',
+                                          style: const TextStyle(fontSize: 18)),
                                     ],
                                   ),
                                 ),
@@ -288,21 +328,22 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
                                   _question?['optionD'],
                                 ];
                                 final isSelected = _selectedOption == i;
-                                final isCorrect = options[i] == _question?['correctAnswer'];
+                                final isCorrect =
+                                    options[i] == _question?['correctAnswer'];
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 12),
                                   child: GestureDetector(
                                     onTap: () => _onOptionTap(i),
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16, horizontal: 18),
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? (isCorrect && _answered
                                                 ? Colors.green[100]
                                                 : (!isCorrect && _answered
                                                     ? Colors.red[100]
-                                                    : Colors.blue[50])
-                                              )
+                                                    : Colors.blue[50]))
                                             : Colors.white,
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
@@ -318,14 +359,20 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
                                       ),
                                       child: Row(
                                         children: [
-                                          Text('${String.fromCharCode(65 + i)}.', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                          Text(
+                                              '${String.fromCharCode(65 + i)}.',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16)),
                                           const SizedBox(width: 12),
                                           Expanded(
                                             child: Text(
                                               options[i] ?? '',
                                               style: TextStyle(
                                                 color: Colors.black,
-                                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                                fontWeight: isSelected
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
                                                 fontSize: 16,
                                               ),
                                             ),
@@ -343,27 +390,43 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: _isCorrect ? Colors.green : Colors.red,
+                                      color: _isCorrect
+                                          ? Colors.green
+                                          : Colors.red,
                                       width: 2,
                                     ),
                                   ),
                                   padding: const EdgeInsets.all(16),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        _isCorrect ? 'Correct! 🎉' : 'Incorrect.',
+                                        _isCorrect
+                                            ? 'Correct! 🎉'
+                                            : 'Incorrect.',
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: _isCorrect ? Colors.green : Colors.red,
+                                          color: _isCorrect
+                                              ? Colors.green
+                                              : Colors.red,
                                         ),
                                       ),
                                       const SizedBox(height: 12),
-                                      Text('Answer: ${_question!['correctAnswer'] ?? ''}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.green)),
+                                      Text(
+                                          'Answer: ${_question!['correctAnswer'] ?? ''}',
+                                          style: const TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.green)),
                                       const SizedBox(height: 12),
-                                      if ((_question!['explanation'] ?? '').isNotEmpty)
-                                        Text('Explanation: ${_question!['explanation']}', style: const TextStyle(fontSize: 16)),
+                                      if ((_question!['explanation'] ?? '')
+                                          .isNotEmpty)
+                                        Text(
+                                            'Explanation: ${_question!['explanation']}',
+                                            style:
+                                                const TextStyle(fontSize: 16)),
                                     ],
                                   ),
                                 ),
@@ -377,7 +440,7 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
                           ),
                         ),
                       ),
-      ),
+                    ),
     );
   }
-} 
+}

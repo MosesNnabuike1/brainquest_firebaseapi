@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class TutorForgotPasswordScreen extends StatefulWidget {
   const TutorForgotPasswordScreen({Key? key}) : super(key: key);

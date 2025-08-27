@@ -1,9 +1,9 @@
+import 'tutor_profile_page.dart';
+import 'tutor_dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'tutor_manage_category_screen.dart';
-import '../student/common_bottom_nav.dart';
-import 'tutor_dashboard_screen.dart';
-
-import 'tutor_profile_page.dart';
+import '../results/tutor_results_page.dart';
+import '../../student/common_bottom_nav.dart';
 
 class TutorMainScreen extends StatefulWidget {
   final String tutorName;
@@ -36,13 +36,19 @@ class _TutorMainScreenState extends State<TutorMainScreen> {
       TutorDashboardScreen(
         tutorName: widget.tutorName,
         tutorId: widget.tutorId,
+        onOpenProfileTab: () {
+          setState(() {
+            _selectedIndex = 3;
+          });
+        },
       ),
       TutorManageCategoryScreen(
         tutorName: widget.tutorName,
         tutorId: widget.tutorId,
       ),
-      // Placeholder for Results tab (to match student nav structure)
-      const Center(child: Text('Results coming soon', style: TextStyle(fontSize: 18))),
+      TutorResultsPage(
+        tutorId: widget.tutorId,
+      ),
       const TutorProfilePage(),
     ];
     return Scaffold(

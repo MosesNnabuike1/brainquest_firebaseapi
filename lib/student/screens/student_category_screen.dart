@@ -1,11 +1,12 @@
-import 'logout_drawer.dart';
-import '../models/category.dart';
-import 'widgets/fixed_header.dart';
-import 'widgets/category_card.dart';
+import '../logout_drawer.dart';
+import '../../models/category.dart';
+import '../widgets/fixed_header.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
+import 'package:firebase_quizzapp/widgets/category_card.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class StudentCategoryScreen extends StatefulWidget {
   final String studentName;
@@ -201,10 +202,8 @@ class _StudentCategoryScreenState extends State<StudentCategoryScreen> {
                                 ),
                               );
                               if (shouldClear == true && context.mounted) {
-                                Navigator.of(context).pushNamedAndRemoveUntil(
-                                  '/',
-                                  (route) => false,
-                                );
+                                if (!context.mounted) return;
+                                context.go('/');
                               }
                             },
                           ),

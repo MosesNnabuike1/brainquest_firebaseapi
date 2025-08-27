@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_quizzapp/student/student_welcome_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:firebase_quizzapp/utils/auth_helper.dart';
 
 class LogoutDrawer extends StatelessWidget {
   const LogoutDrawer({Key? key}) : super(key: key);
@@ -25,11 +25,11 @@ class LogoutDrawer extends StatelessWidget {
             ),
             onPressed: () async {
               Navigator.of(context).pop(); // Close dialog
-              await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const StudentWelcomeScreen()),
-                (route) => false,
-              );
+              await AuthHelper.signOut();
+              // Navigate to splash screen which will handle re-authentication
+              if (context.mounted) {
+                context.go('/splash');
+              }
             },
             child: const Text('Logout', style: TextStyle(color: Colors.white)),
           ),

@@ -2,11 +2,31 @@ import 'package:flutter/material.dart';
 
 class QuestionCard extends StatelessWidget {
   final String questionText;
+  final int? questionLength;
 
-  const QuestionCard({Key? key, required this.questionText}) : super(key: key);
+  const QuestionCard({
+    Key? key,
+    required this.questionText,
+    this.questionLength,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Calculate dynamic height based on question length
+    double cardHeight = 140; // Default height
+
+    if (questionLength != null) {
+      if (questionLength! < 50) {
+        cardHeight = 120; // Short questions - increased from 100
+      } else if (questionLength! < 100) {
+        cardHeight = 140; // Medium questions - increased from 120
+      } else if (questionLength! < 150) {
+        cardHeight = 160; // Long questions - increased from 140
+      } else {
+        cardHeight = 180; // Very long questions - increased from 160
+      }
+    }
+
     return Stack(
       children: [
         Container(
@@ -22,7 +42,7 @@ class QuestionCard extends StatelessWidget {
             child: Image.asset(
               'assets/questioncard.png',
               width: double.infinity,
-              height: 140,
+              height: cardHeight,
               fit: BoxFit.cover,
             ),
           ),
@@ -30,16 +50,17 @@ class QuestionCard extends StatelessWidget {
         Positioned.fill(
           child: Container(
             alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 16, vertical: 8), // Increased padding
             child: Text(
               questionText,
               style: const TextStyle(
-                fontSize: 15,
+                fontSize: 16, // Slightly larger font
                 color: Colors.black,
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
-              maxLines: 4,
+              maxLines: questionLength != null && questionLength! > 100 ? 6 : 4,
               overflow: TextOverflow.ellipsis,
             ),
           ),

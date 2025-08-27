@@ -1,6 +1,6 @@
 import 'quiz_summary_dialog.dart';
 import 'package:flutter/material.dart';
-import '../../tutor/tutor_question_list_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class CategoryQuizRow extends StatelessWidget {
   final String title;
@@ -56,22 +56,18 @@ class CategoryQuizRow extends StatelessWidget {
           ElevatedButton(
             onPressed: showAddQuestionButton
                 ? () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TutorQuestionListScreen(
-                          categoryId: categoryId,
-                          categoryTitle: title,
-                          tutorId: tutorId,
-                        ),
-                      ),
-                    );
+                    context.push('/tutor/questions', extra: {
+                      'categoryId': categoryId,
+                      'categoryTitle': title,
+                      'tutorId': tutorId,
+                    });
                   }
                 : () async {
                     if (questions <= 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('No questions available in this category yet.'),
+                          content: Text(
+                              'No questions available in this category yet.'),
                           backgroundColor: Colors.orange,
                           duration: Duration(seconds: 3),
                         ),

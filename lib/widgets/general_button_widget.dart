@@ -99,7 +99,6 @@ class AppDialog extends StatelessWidget {
   }
 
   List<Widget> _buildActions() {
-    // Stack actions vertically with spacing
     return actions
         .asMap()
         .entries

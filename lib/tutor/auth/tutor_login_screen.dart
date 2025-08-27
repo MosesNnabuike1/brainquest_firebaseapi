@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_quizzapp/tutor/tutor_main_screen.dart';
-import 'package:firebase_quizzapp/student/student_welcome_screen.dart';
-import 'package:firebase_quizzapp/tutor/tutor_forgot_password_screen.dart';
 
 class TutorLoginScreen extends StatefulWidget {
   const TutorLoginScreen({Key? key}) : super(key: key);
@@ -73,16 +71,10 @@ class _TutorLoginScreenState extends State<TutorLoginScreen> {
       if (userDoc.exists && userDoc.data()?['role'] == 'tutor') {
         if (mounted) {
           setState(() => _isLoading = false);
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TutorMainScreen(
-                tutorName: userDoc.data()?['fullName'] ?? 'Tutor',
-                tutorId: userDoc.data()?['tutorId'],
-              ),
-            ),
-            (route) => false,
-          );
+          context.go('/tutor/main', extra: {
+            'tutorId': userDoc.data()?['tutorId'],
+            'tutorName': userDoc.data()?['fullName'],
+          });
         }
       } else {
         await FirebaseAuth.instance.signOut();
@@ -136,13 +128,7 @@ class _TutorLoginScreenState extends State<TutorLoginScreen> {
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.black),
                           onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const StudentWelcomeScreen(),
-                              ),
-                              (route) => false,
-                            );
+                            context.go('/student/welcome');
                           },
                         ),
                       ],
@@ -292,12 +278,7 @@ class _TutorLoginScreenState extends State<TutorLoginScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const TutorForgotPasswordScreen()),
-                        );
+                        context.push('/tutor/forgot-password');
                       },
                       child: const Text(
                         'Forgot Password?',

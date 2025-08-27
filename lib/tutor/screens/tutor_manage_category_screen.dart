@@ -1,11 +1,11 @@
-import 'add_category_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_quizzapp/models/category.dart';
-import 'package:firebase_quizzapp/tutor/logout_drawer.dart';
-import 'package:firebase_quizzapp/student/widgets/fixed_header.dart';
-import 'package:firebase_quizzapp/student/widgets/category_card.dart';
-import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
+import 'package:firebase_quizzapp/widgets/category_card.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
+
+// import 'package:firebase_quizzapp/student/widgets/fixed_header.dart';
 
 class TutorManageCategoryScreen extends StatefulWidget {
   final String tutorName;
@@ -225,6 +225,31 @@ class _TutorManageCategoryScreenState extends State<TutorManageCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 1,
+        scrolledUnderElevation: 0,
+        shadowColor: Colors.black12,
+        surfaceTintColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 72,
+        titleSpacing: 16,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+        ),
+        title: const Text(
+          "Category Management",
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
+        centerTitle: false,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
       backgroundColor: Colors.white,
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -232,13 +257,9 @@ class _TutorManageCategoryScreenState extends State<TutorManageCategoryScreen> {
           const SizedBox(height: 16),
           FloatingActionButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      AddCategoryScreen(tutorId: widget.tutorId),
-                ),
-              ).then((_) => _loadCategories());
+              context.push('/tutor/add-category', extra: {
+                'tutorId': widget.tutorId,
+              });
             },
             backgroundColor: const Color(0xFF181DB4),
             tooltip: 'Add Category',
@@ -246,44 +267,28 @@ class _TutorManageCategoryScreenState extends State<TutorManageCategoryScreen> {
           ),
         ],
       ),
-      drawer: const LogoutDrawer(),
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: FixedHeader(
-                studentName: widget.tutorName,
-                onProfileTap: () {
-                  Scaffold.of(context).openDrawer();
-                },
-                onSettingsTap: () {},
-                onDrawerOpen: () {},
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            //   child: FixedHeader(
+            //     studentName: widget.tutorName,
+            //     onProfileTap: () {
+            //       Scaffold.of(context).openDrawer();
+            //     },
+            //     onSettingsTap: () {},
+            //     onDrawerOpen: () {},
+            //   ),
+            // ),
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Manage Quiz",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    "Here you can edit a quiz and upage",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black54,
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                ],
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Text(
+                "Add new categories, edit and update existing categories.",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black54,
+                ),
               ),
             ),
             Expanded(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_quizzapp/student/student_main_screen.dart';
 
 class TutorIdScreen extends StatefulWidget {
   final String studentName;
@@ -53,14 +53,10 @@ class _TutorIdScreenState extends State<TutorIdScreen> {
         } else {
           // Tutor ID is valid, navigate to student main screen
           if (mounted) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => StudentMainScreen(
-                  studentName: widget.studentName,
-                  tutorId: tutorId,
-                ),
-              ),
-            );
+            context.go('/home', extra: {
+              'studentName': widget.studentName,
+              'tutorId': tutorId,
+            });
           }
         }
       } catch (e) {

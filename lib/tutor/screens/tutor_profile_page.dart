@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../student/widgets/general_button_widget.dart';
-import 'tutor_login_screen.dart';
+import 'package:firebase_quizzapp/utils/auth_helper.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class TutorProfilePage extends StatefulWidget {
   const TutorProfilePage({Key? key}) : super(key: key);
@@ -33,14 +34,16 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                       RadioListTile<int>(
                         value: 0,
                         groupValue: selectedOption,
-                        onChanged: (val) => setState(() => selectedOption = val ?? 0),
+                        onChanged: (val) =>
+                            setState(() => selectedOption = val ?? 0),
                         title: const Text('Change Tutor ID'),
                         contentPadding: EdgeInsets.zero,
                       ),
                       RadioListTile<int>(
                         value: 1,
                         groupValue: selectedOption,
-                        onChanged: (val) => setState(() => selectedOption = val ?? 0),
+                        onChanged: (val) =>
+                            setState(() => selectedOption = val ?? 0),
                         title: const Text('Change Password'),
                         contentPadding: EdgeInsets.zero,
                       ),
@@ -151,7 +154,8 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                       if (newPass.length < 6) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                              content: Text('Password must be at least 6 characters.'),
+                              content: Text(
+                                  'Password must be at least 6 characters.'),
                               backgroundColor: Colors.red),
                         );
                         return;
@@ -186,6 +190,7 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
       },
     );
   }
+
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
   bool _isLoading = true;
@@ -210,15 +215,17 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final Color primaryColor = const Color(0xFF181DB4);
-    final Color accentColor = const Color(0xFFFFBA31);
-    final Color cardColor = const Color(0xFFF8F8FC);
+    const Color primaryColor = Color(0xFF181DB4);
+    const Color accentColor = Color(0xFFFFBA31);
+    const Color cardColor = Color(0xFFF8F8FC);
     return Scaffold(
       backgroundColor: cardColor,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _tutorData == null
-              ? const Center(child: Text('No profile data found.', style: TextStyle(fontSize: 16, color: Colors.black54)))
+              ? const Center(
+                  child: Text('No profile data found.',
+                      style: TextStyle(fontSize: 16, color: Colors.black54)))
               : CustomScrollView(
                   slivers: [
                     SliverAppBar(
@@ -228,7 +235,7 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                       iconTheme: const IconThemeData(color: Colors.white),
                       flexibleSpace: FlexibleSpaceBar(
                         background: Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             gradient: LinearGradient(
                               colors: [primaryColor, accentColor],
                               begin: Alignment.topLeft,
@@ -238,16 +245,18 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              CircleAvatar(
+                              const CircleAvatar(
                                 radius: 44,
                                 backgroundColor: Colors.white,
-                                child: Icon(Icons.person, size: 54, color: primaryColor),
+                                child: Icon(Icons.person,
+                                    size: 54, color: primaryColor),
                               ),
                               const SizedBox(height: 12),
                               Text(
                                 (() {
                                   final name = _tutorData?['name'];
-                                  if (name is String && name.trim().isNotEmpty) {
+                                  if (name is String &&
+                                      name.trim().isNotEmpty) {
                                     return name;
                                   } else {
                                     return 'No Name';
@@ -275,7 +284,8 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                     ),
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 32),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -288,18 +298,22 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                               ),
                             ],
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 32, horizontal: 20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
-                                  const Icon(Icons.badge, color: Color(0xFF181DB4)),
+                                  const Icon(Icons.badge,
+                                      color: Color(0xFF181DB4)),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
                                       'Tutor ID: ${_tutorData?['tutorId'] ?? 'N/A'}',
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
                                     ),
                                   ),
                                 ],
@@ -316,8 +330,11 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   ElevatedButton.icon(
-                                    icon: const Icon(Icons.edit, color: Colors.black, size: 20),
-                                    label: const Text('Edit Profile', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    icon: const Icon(Icons.edit,
+                                        color: Colors.black, size: 20),
+                                    label: const Text('Edit Profile',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: accentColor,
                                       foregroundColor: Colors.black,
@@ -325,11 +342,16 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                      textStyle: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     onPressed: () {
-                                      final nameController = TextEditingController(text: _tutorData?['name'] ?? '');
+                                      final nameController =
+                                          TextEditingController(
+                                              text: _tutorData?['name'] ?? '');
                                       showDialog(
                                         context: context,
                                         builder: (context) => AlertDialog(
@@ -343,14 +365,17 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                                           ),
                                           actions: [
                                             TextButton(
-                                              onPressed: () => Navigator.of(context).pop(),
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
                                               child: const Text('Cancel'),
                                             ),
                                             ElevatedButton(
                                               onPressed: () async {
-                                                final newName = nameController.text.trim();
+                                                final newName =
+                                                    nameController.text.trim();
                                                 if (newName.isEmpty) return;
-                                                final user = FirebaseAuth.instance.currentUser;
+                                                final user = FirebaseAuth
+                                                    .instance.currentUser;
                                                 if (user == null) return;
                                                 await FirebaseFirestore.instance
                                                     .collection('tutors')
@@ -360,8 +385,13 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                                                   _tutorData?['name'] = newName;
                                                 });
                                                 Navigator.of(context).pop();
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text('Name updated!'), backgroundColor: Colors.green),
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content:
+                                                          Text('Name updated!'),
+                                                      backgroundColor:
+                                                          Colors.green),
                                                 );
                                               },
                                               child: const Text('Save'),
@@ -373,24 +403,11 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                                   ),
                                   const SizedBox(height: 18),
                                   ElevatedButton.icon(
-                                    icon: const Icon(Icons.lock, color: Colors.white, size: 20),
-                                    label: const Text('Update Passcode', style: TextStyle(fontWeight: FontWeight.bold)),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.deepPurpleAccent,
-                                      foregroundColor: Colors.white,
-                                      elevation: 2,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                    ),
-                                    onPressed: _showUpdatePasscodeDialog,
-                                  ),
-                                  const SizedBox(height: 18),
-                                  ElevatedButton.icon(
-                                    icon: const Icon(Icons.logout, color: Colors.white, size: 20),
-                                    label: const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    icon: const Icon(Icons.lock,
+                                        color: Colors.white, size: 20),
+                                    label: const Text('Change Credentials',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: primaryColor,
                                       foregroundColor: Colors.white,
@@ -398,17 +415,39 @@ class _TutorProfilePageState extends State<TutorProfilePage> {
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                      textStyle: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    onPressed: _showUpdatePasscodeDialog,
+                                  ),
+                                  const SizedBox(height: 18),
+                                  ElevatedButton.icon(
+                                    icon: const Icon(Icons.logout,
+                                        color: Colors.white, size: 20),
+                                    label: const Text('Logout',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      foregroundColor: Colors.white,
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                      textStyle: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     onPressed: () async {
-                                      await FirebaseAuth.instance.signOut();
+                                      await AuthHelper.signOut();
                                       if (context.mounted) {
-                                        Navigator.of(context).pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                              builder: (context) => const TutorLoginScreen()),
-                                          (route) => false,
-                                        );
+                                        // Navigate to splash screen which will handle re-authentication
+                                        context.go('/splash');
                                       }
                                     },
                                   ),

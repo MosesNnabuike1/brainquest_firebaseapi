@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_quizzapp/student/question_page.dart';
-import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
+import 'package:go_router/go_router.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class QuizSummaryDialog extends StatelessWidget {
   final String subject;
@@ -58,19 +58,12 @@ class QuizSummaryDialog extends StatelessWidget {
               return;
             }
             Navigator.of(context).pop();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return QuestionPage(
-                    subject: subject,
-                    topic: topic,
-                    categoryId: categoryId,
-                    tutorId: tutorId,
-                  );
-                },
-              ),
-            );
+            context.push('/question', extra: {
+              'subject': subject,
+              'topic': topic,
+              'categoryId': categoryId,
+              'tutorId': tutorId,
+            });
           },
           backgroundColor: const Color(0xFF181DB4),
           fontSize: 16,

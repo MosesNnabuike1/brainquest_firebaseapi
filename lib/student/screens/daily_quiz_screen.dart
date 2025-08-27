@@ -1,16 +1,17 @@
 import 'dart:math';
 import 'package:intl/intl.dart';
-import 'widgets/option_tile.dart';
-import 'widgets/question_card.dart';
-import 'widgets/answer_overlay.dart';
-import 'widgets/question_header.dart';
+import '../widgets/option_tile.dart';
+import '../widgets/question_card.dart';
 import 'package:flutter/material.dart';
-import 'widgets/general_button_widget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../widgets/answer_overlay.dart';
+import '../widgets/question_header.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class DailyQuizScreen extends StatefulWidget {
-  const DailyQuizScreen({Key? key}) : super(key: key);
+  final String? tutorId;
+  const DailyQuizScreen({Key? key, this.tutorId}) : super(key: key);
 
   @override
   State<DailyQuizScreen> createState() => _DailyQuizScreenState();
@@ -30,8 +31,7 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
   int _score = 0;
   bool _isLoading = true;
 
-  String? get _tutorId =>
-      (ModalRoute.of(context)?.settings.arguments as Map?)?['tutorId'];
+  String? get _tutorId => widget.tutorId;
 
   @override
   void initState() {
@@ -81,7 +81,8 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
         final data = dailyQuizDoc.data()!;
         final questions =
             List<Map<String, dynamic>>.from(data['questions'] ?? []);
-        final actualQuestions = questions.length <= 10 ? questions : questions.take(10).toList();
+        final actualQuestions =
+            questions.length <= 10 ? questions : questions.take(10).toList();
 
         if (actualQuestions.isNotEmpty) {
           setState(() {
@@ -136,7 +137,9 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
       final seed = today.hashCode ^ tutorId.hashCode;
       final random = Random(seed);
       allQuestions.shuffle(random);
-      final dailyQuestions = allQuestions.length <= 10 ? allQuestions : allQuestions.take(10).toList();
+      final dailyQuestions = allQuestions.length <= 10
+          ? allQuestions
+          : allQuestions.take(10).toList();
       setState(() {
         _questions = dailyQuestions;
         _selectedAnswers = List<int?>.filled(dailyQuestions.length, null);
@@ -212,7 +215,12 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
       final List<Map<String, dynamic>> questionResults = [];
       for (int i = 0; i < _questions.length; i++) {
         final q = _questions[i];
-        final options = [q['optionA'], q['optionB'], q['optionC'], q['optionD']];
+        final options = [
+          q['optionA'],
+          q['optionB'],
+          q['optionC'],
+          q['optionD']
+        ];
         final selectedIdx = _selectedAnswers[i];
         final selectedValue = selectedIdx != null ? options[selectedIdx] : '';
         questionResults.add({
@@ -237,7 +245,6 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
       // Optionally handle error (e.g., show a snackbar)
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -276,7 +283,8 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
                     ),
                     const SizedBox(height: 30),
                     QuestionCard(
-                      questionText: currentQuestion['questions'] ?? 'No question',
+                      questionText:
+                          currentQuestion['questions'] ?? 'No question',
                     ),
                     const SizedBox(height: 32),
                     ...options.asMap().entries.map((entry) {
@@ -341,10 +349,14 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
             children: [
               Row(
                 children: [
-                  const Icon(Icons.emoji_events, color: Color(0xFFFFBA31), size: 32),
+                  const Icon(Icons.emoji_events,
+                      color: Color(0xFFFFBA31), size: 32),
                   const SizedBox(width: 10),
                   Text('Quiz Completed!',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.bold)),
                 ],
               ),
               const SizedBox(height: 16),
@@ -364,8 +376,14 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Score:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-                    Text('$score / ${questions.length}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF2196F3))),
+                    const Text('Score:',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500)),
+                    Text('$score / ${questions.length}',
+                        style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2196F3))),
                   ],
                 ),
               ),
@@ -392,22 +410,29 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
                         color: wasCorrect ? Colors.green[50] : Colors.red[50],
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: wasCorrect ? Colors.green[200]! : Colors.red[200]!,
+                          color: wasCorrect
+                              ? Colors.green[200]!
+                              : Colors.red[200]!,
                           width: 1.2,
                         ),
                       ),
                       child: ListTile(
-                        title: Text(q['questions'] ?? '', style: const TextStyle(fontWeight: FontWeight.w600)),
+                        title: Text(q['questions'] ?? '',
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w600)),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 4),
-                            Text('Your answer: ${selected ?? "-"}', style: const TextStyle(color: Colors.black87)),
-                            Text('Correct answer: $correct', style: const TextStyle(color: Colors.black54)),
+                            Text('Your answer: ${selected ?? "-"}',
+                                style: const TextStyle(color: Colors.black87)),
+                            Text('Correct answer: $correct',
+                                style: const TextStyle(color: Colors.black54)),
                           ],
                         ),
                         trailing: wasCorrect
-                            ? const Icon(Icons.check_circle, color: Colors.green)
+                            ? const Icon(Icons.check_circle,
+                                color: Colors.green)
                             : const Icon(Icons.cancel, color: Colors.red),
                       ),
                     );
@@ -422,8 +447,10 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
                     backgroundColor: const Color(0xFFFFBA31),
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () => Navigator.pop(context),
                   child: const Text('Back to Dashboard'),

@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class AddCriticalThinkingPuzzleScreen extends StatefulWidget {
   final String? tutorId;
-  const AddCriticalThinkingPuzzleScreen({Key? key, this.tutorId}) : super(key: key);
+  const AddCriticalThinkingPuzzleScreen({Key? key, this.tutorId})
+      : super(key: key);
 
   @override
-  State<AddCriticalThinkingPuzzleScreen> createState() => _AddCriticalThinkingPuzzleScreenState();
+  State<AddCriticalThinkingPuzzleScreen> createState() =>
+      _AddCriticalThinkingPuzzleScreenState();
 }
 
-class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuzzleScreen> {
+class _AddCriticalThinkingPuzzleScreenState
+    extends State<AddCriticalThinkingPuzzleScreen> {
   final _formKey = GlobalKey<FormState>();
   String? _selectedCategoryId;
   List<Map<String, dynamic>> _categories = [];
@@ -31,23 +34,30 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
 
   Future<void> _loadCategories() async {
     if (widget.tutorId == null) return;
-    setState(() { _isLoading = true; });
+    setState(() {
+      _isLoading = true;
+    });
     final snapshot = await FirebaseFirestore.instance
         .collection('categories')
         .where('tutorId', isEqualTo: widget.tutorId)
         .get();
     setState(() {
-      _categories = snapshot.docs.map((doc) => {
-        'id': doc.id,
-        'title': doc.data()['title'] ?? '',
-      }).toList();
+      _categories = snapshot.docs
+          .map((doc) => {
+                'id': doc.id,
+                'title': doc.data()['title'] ?? '',
+              })
+          .toList();
       _isLoading = false;
     });
   }
 
   Future<void> _savePuzzle() async {
-    if (!_formKey.currentState!.validate() || _selectedCategoryId == null) return;
-    setState(() { _isLoading = true; });
+    if (!_formKey.currentState!.validate() || _selectedCategoryId == null)
+      return;
+    setState(() {
+      _isLoading = true;
+    });
     try {
       String correctAnswerText;
       switch (_correctOption) {
@@ -83,7 +93,9 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
       });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Logic puzzle added!'), backgroundColor: Colors.green),
+        const SnackBar(
+            content: Text('Logic puzzle added!'),
+            backgroundColor: Colors.green),
       );
       Navigator.pop(context);
     } catch (e) {
@@ -92,7 +104,10 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
         SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );
     } finally {
-      if (mounted) setState(() { _isLoading = false; });
+      if (mounted)
+        setState(() {
+          _isLoading = false;
+        });
     }
   }
 
@@ -111,7 +126,11 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Correct Answer:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87)),
+        const Text('Correct Answer:',
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87)),
         const SizedBox(height: 8),
         Row(
           children: ['A', 'B', 'C', 'D'].map((option) {
@@ -121,7 +140,9 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
                 value: option,
                 groupValue: _correctOption,
                 onChanged: (value) {
-                  setState(() { _correctOption = value!; });
+                  setState(() {
+                    _correctOption = value!;
+                  });
                 },
                 contentPadding: EdgeInsets.zero,
               ),
@@ -156,7 +177,8 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
                         decoration: const InputDecoration(
                           labelText: 'Select Category',
                           border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
                         ),
                         items: _categories.map((cat) {
                           return DropdownMenuItem<String>(
@@ -165,9 +187,12 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
                           );
                         }).toList(),
                         onChanged: (value) {
-                          setState(() { _selectedCategoryId = value; });
+                          setState(() {
+                            _selectedCategoryId = value;
+                          });
                         },
-                        validator: (value) => value == null ? 'Please select a category' : null,
+                        validator: (value) =>
+                            value == null ? 'Please select a category' : null,
                       ),
                       const SizedBox(height: 24),
                       TextFormField(
@@ -178,10 +203,16 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
                         ),
                         minLines: 2,
                         maxLines: 4,
-                        validator: (value) => value == null || value.isEmpty ? 'Enter the puzzle question' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Enter the puzzle question'
+                            : null,
                       ),
                       const SizedBox(height: 16),
-                      const Text('Options:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+                      const Text('Options:',
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black)),
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _optionAController,
@@ -189,7 +220,9 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
                           labelText: 'Option A',
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) => value == null || value.isEmpty ? 'Enter option A' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Enter option A'
+                            : null,
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -198,7 +231,9 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
                           labelText: 'Option B',
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) => value == null || value.isEmpty ? 'Enter option B' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Enter option B'
+                            : null,
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -207,7 +242,9 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
                           labelText: 'Option C',
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) => value == null || value.isEmpty ? 'Enter option C' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Enter option C'
+                            : null,
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -216,7 +253,9 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
                           labelText: 'Option D',
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) => value == null || value.isEmpty ? 'Enter option D' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Enter option D'
+                            : null,
                       ),
                       const SizedBox(height: 24),
                       _buildCorrectOptionSelector(),
@@ -243,4 +282,4 @@ class _AddCriticalThinkingPuzzleScreenState extends State<AddCriticalThinkingPuz
             ),
     );
   }
-} 
+}

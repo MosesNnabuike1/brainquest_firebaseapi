@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_quizzapp/tutor/tutor_registration_screen.dart';
+import 'package:go_router/go_router.dart';
+// import removed; navigation handled by go_router
 
 class StudentWelcomeScreen extends StatelessWidget {
   const StudentWelcomeScreen({super.key});
@@ -44,7 +45,8 @@ class StudentWelcomeScreen extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/register');
+                      // Use go_router; no functional logic changed
+                      context.go('/register');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFFAA00),
@@ -67,7 +69,8 @@ class StudentWelcomeScreen extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/login');
+                      // Use go_router; no functional logic changed
+                      context.go('/login');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF181DB4),
@@ -88,12 +91,7 @@ class StudentWelcomeScreen extends StatelessWidget {
                 // Tutor Registration Link
                 InkWell(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TutorRegistrationScreen(),
-                      ),
-                    );
+                    context.push('/tutor-register');
                   },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),

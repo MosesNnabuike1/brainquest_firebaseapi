@@ -1,18 +1,19 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:firebase_quizzapp/tutor/tutor_login_screen.dart';
 import 'package:firebase_quizzapp/widgets/cancel_icon_widget.dart';
-import 'package:firebase_quizzapp/student/widgets/general_button_widget.dart';
+import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class TutorRegistrationScreen extends StatefulWidget {
   const TutorRegistrationScreen({Key? key}) : super(key: key);
 
   @override
-  State<TutorRegistrationScreen> createState() => _TutorRegistrationScreenState();
+  State<TutorRegistrationScreen> createState() =>
+      _TutorRegistrationScreenState();
 }
 
 class _TutorRegistrationScreenState extends State<TutorRegistrationScreen> {
@@ -20,7 +21,8 @@ class _TutorRegistrationScreenState extends State<TutorRegistrationScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool _isLoading = false;
   bool _showPassword = false;
@@ -79,7 +81,8 @@ class _TutorRegistrationScreenState extends State<TutorRegistrationScreen> {
   }
 
   Future<String> _generateUniqueTutorId(String name) async {
-    String base = name.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
+    String base =
+        name.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
     String tutorId;
     bool exists = true;
     final random = Random();
@@ -123,7 +126,8 @@ class _TutorRegistrationScreenState extends State<TutorRegistrationScreen> {
         }
 
         // Generate unique Tutor ID
-        String tutorId = await _generateUniqueTutorId(_usernameController.text.trim());
+        String tutorId =
+            await _generateUniqueTutorId(_usernameController.text.trim());
 
         try {
           // Create user with Firebase Authentication
@@ -167,11 +171,15 @@ class _TutorRegistrationScreenState extends State<TutorRegistrationScreen> {
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('You have successfully registered as a tutor on the Brain Quest app.'),
+                    const Text(
+                        'You have successfully registered as a tutor on the Brain Quest app.'),
                     const SizedBox(height: 16),
-                    const Text('Your Tutor ID is:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text('Tutor ID is:',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
-                    SelectableText(tutorId, style: const TextStyle(fontSize: 18, color: Colors.blue)),
+                    SelectableText(tutorId,
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.blue)),
                     const SizedBox(height: 8),
                     ElevatedButton.icon(
                       icon: const Icon(Icons.copy, size: 18),
@@ -179,7 +187,8 @@ class _TutorRegistrationScreenState extends State<TutorRegistrationScreen> {
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: tutorId));
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Tutor ID copied to clipboard!')),
+                          const SnackBar(
+                              content: Text('Tutor ID copied to clipboard!')),
                         );
                       },
                     ),
@@ -190,13 +199,10 @@ class _TutorRegistrationScreenState extends State<TutorRegistrationScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const TutorLoginScreen(),
-                          ),
-                          (route) => false,
-                        );
+                        context.go('/tutor/main', extra: {
+                          'tutorId': tutorId,
+                          'tutorName': _usernameController.text.trim(),
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF181DB4),
@@ -316,7 +322,8 @@ class _TutorRegistrationScreenState extends State<TutorRegistrationScreen> {
                     TextFormField(
                       controller: _usernameController,
                       decoration: InputDecoration(
-                        hintText: 'Type your full name as it appears on your ID',
+                        hintText:
+                            'Type your full name as it appears on your ID',
                         hintStyle: const TextStyle(
                           color: Colors.black54,
                           fontWeight: FontWeight.normal,
@@ -369,7 +376,8 @@ class _TutorRegistrationScreenState extends State<TutorRegistrationScreen> {
                     TextFormField(
                       controller: _passwordController,
                       decoration: InputDecoration(
-                        hintText: 'Choose a strong password (min. 6 characters)',
+                        hintText:
+                            'Choose a strong password (min. 6 characters)',
                         hintStyle: const TextStyle(
                           color: Colors.black54,
                           fontWeight: FontWeight.normal,
@@ -448,13 +456,7 @@ class _TutorRegistrationScreenState extends State<TutorRegistrationScreen> {
                     Center(
                       child: TextButton(
                         onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const TutorLoginScreen(),
-                            ),
-                            (route) => false,
-                          );
+                          context.go('/tutor/login');
                         },
                         child: const Text(
                           'Already have an account? Login',
@@ -481,4 +483,4 @@ class _TutorRegistrationScreenState extends State<TutorRegistrationScreen> {
       ],
     );
   }
-} 
+}
