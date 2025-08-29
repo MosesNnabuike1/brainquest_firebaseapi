@@ -23,6 +23,7 @@ import 'package:firebase_quizzapp/tutor/screens/tutor_question_list_screen.dart'
 import 'package:firebase_quizzapp/student/auth/student_registration_screen.dart';
 import 'package:firebase_quizzapp/tutor/screens/tutor_manage_category_screen.dart';
 import 'package:firebase_quizzapp/student/auth/student_forgot_password_screen.dart';
+import 'package:firebase_quizzapp/student/screens/daily_critical_thinking_screen.dart';
 import 'package:firebase_quizzapp/tutor/editing/add_critical_thinking_puzzle_screen.dart';
 
 void main() async {
@@ -98,6 +99,15 @@ class MyApp extends StatelessWidget {
           builder: (context, state) {
             final extra = (state.extra is Map) ? state.extra as Map : const {};
             return DailyQuizScreen(
+              tutorId: extra['tutorId'] as String?,
+            );
+          },
+        ),
+        GoRoute(
+          path: '/daily-critical',
+          builder: (context, state) {
+            final extra = (state.extra is Map) ? state.extra as Map : const {};
+            return DailyCriticalThinkingScreen(
               tutorId: extra['tutorId'] as String?,
             );
           },
@@ -273,11 +283,18 @@ class _SplashScreenState extends State<SplashScreen> {
           'tutorName': userData['fullName'] as String? ?? 'Tutor',
         });
       } else if (role == 'student') {
-        // Navigate to student dashboard
-        context.go('/home', extra: {
-          'studentName': userData['fullName'] as String? ?? 'Student',
-          'tutorId': null, // Students will need to enter tutor ID
-        });
+        // If student, ensure tutorId is provided; otherwise route to TutorIdScreen
+        final maybeTutorId = userData['tutorId'] as String?;
+        if (maybeTutorId == null || maybeTutorId.isEmpty) {
+          context.go('/tutor-id', extra: {
+            'studentName': userData['fullName'] as String? ?? 'Student',
+          });
+        } else {
+          context.go('/home', extra: {
+            'studentName': userData['fullName'] as String? ?? 'Student',
+            'tutorId': maybeTutorId,
+          });
+        }
       } else {
         // Unknown role, go to welcome screen
         context.go('/');

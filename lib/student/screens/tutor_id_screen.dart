@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_quizzapp/widgets/cancel_icon_widget.dart';
 
 class TutorIdScreen extends StatefulWidget {
   final String studentName;
@@ -92,6 +93,16 @@ class _TutorIdScreenState extends State<TutorIdScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 8.0),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: CancelIconWidget(
+                          rightPadding: 0,
+                          size: 20,
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 40),
                     // Welcome Text
                     Text(

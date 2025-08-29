@@ -138,7 +138,6 @@ class _RecentActivitiesScreenState extends State<RecentActivitiesScreen> {
         final correctAnswers = (data['correctAnswers'] ?? 0) as int;
         final totalQuestionsInQuiz = (data['totalQuestions'] ?? 1) as int;
 
-
         if (correctAnswers == totalQuestionsInQuiz) {
           perfectScores++;
         }
@@ -229,6 +228,11 @@ class _RecentActivitiesScreenState extends State<RecentActivitiesScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            tooltip: 'Close',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadRecentActivities,

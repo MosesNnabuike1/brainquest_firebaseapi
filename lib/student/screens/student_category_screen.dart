@@ -1,12 +1,9 @@
-import '../logout_drawer.dart';
 import '../../models/category.dart';
-import '../widgets/fixed_header.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_quizzapp/widgets/category_card.dart';
-import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
+// Removed FixedHeader from this screen
 
 class StudentCategoryScreen extends StatefulWidget {
   final String studentName;
@@ -147,84 +144,24 @@ class _StudentCategoryScreenState extends State<StudentCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const LogoutDrawer(),
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+        title: const Text(
+          "Choose a Quiz Category",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: false,
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            // Fixed header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: FixedHeader(
-                studentName: widget.studentName,
-                onProfileTap: () {
-                  // TODO: Implement profile tap
-                },
-                onSettingsTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AppDialog(
-                      title: 'Settings',
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.delete_outline),
-                            title: const Text('Clear App Data'),
-                            onTap: () async {
-                              Navigator.pop(context);
-                              // Show confirmation dialog
-                              final shouldClear = await showDialog<bool>(
-                                context: context,
-                                builder: (context) => AppDialog(
-                                  title: 'Clear App Data',
-                                  content: const Text(
-                                      'This will clear all app data and cache. You will need to log in again. Are you sure?'),
-                                  actions: [
-                                    GeneralButtonWidget(
-                                      text: 'Cancel',
-                                      onPressed: () =>
-                                          Navigator.pop(context, false),
-                                      backgroundColor: const Color(0xFFFFBA31),
-                                      textColor: Colors.black,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    GeneralButtonWidget(
-                                      text: 'Clear',
-                                      onPressed: () =>
-                                          Navigator.pop(context, true),
-                                      backgroundColor: const Color(0xFF181DB4),
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ],
-                                ),
-                              );
-                              if (shouldClear == true && context.mounted) {
-                                if (!context.mounted) return;
-                                context.go('/');
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      actions: [
-                        GeneralButtonWidget(
-                          text: 'Close',
-                          onPressed: () => Navigator.pop(context),
-                          backgroundColor: const Color(0xFFFFBA31),
-                          textColor: Colors.black,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                onDrawerOpen: () => Scaffold.of(context).openDrawer(),
-              ),
-            ),
             // Scrollable content
             Expanded(
               child: SingleChildScrollView(
@@ -233,8 +170,7 @@ class _StudentCategoryScreenState extends State<StudentCategoryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildPageTitle(),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 12),
                     if (_isLoading)
                       const Center(child: CircularProgressIndicator())
                     else

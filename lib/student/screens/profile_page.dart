@@ -319,16 +319,6 @@ class _ProfilePageState extends State<ProfilePage> {
         iconTheme: const IconThemeData(color: Colors.black),
         title: const Text('Profile',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: IconButton(
-              icon: const Icon(Icons.logout, color: Colors.red),
-              onPressed: _showLogoutDialog,
-              tooltip: 'Logout',
-            ),
-          ),
-        ],
       ),
       body: Stack(
         children: [
@@ -418,6 +408,35 @@ class _ProfilePageState extends State<ProfilePage> {
                     onPressed: _showChangePasswordDialog,
                     fontSize: 16,
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.logout,
+                          color: Colors.white, size: 20),
+                      label: const Text(
+                        'Logout',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        textStyle: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: () async {
+                        // mirror tutor behavior: sign out and go to splash
+                        await _auth.signOut();
+                        if (!mounted) return;
+                        context.go('/splash');
+                      },
+                    ),
                   ),
                 ],
               ),

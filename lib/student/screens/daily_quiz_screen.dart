@@ -7,6 +7,7 @@ import '../widgets/answer_overlay.dart';
 import '../widgets/question_header.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_quizzapp/widgets/cancel_icon_widget.dart';
 import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class DailyQuizScreen extends StatefulWidget {
@@ -267,6 +268,18 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
       backgroundColor: const Color(0xFFF5F5F5),
       body: Stack(
         children: [
+          const SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: CancelIconWidget(
+                  rightPadding: 0,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),

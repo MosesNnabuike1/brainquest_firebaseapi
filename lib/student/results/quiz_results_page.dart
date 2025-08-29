@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_quizzapp/student/widgets/fixed_header.dart';
+// FixedHeader removed from this screen
 
 class QuizResultsPage extends StatefulWidget {
   const QuizResultsPage({Key? key}) : super(key: key);
@@ -20,20 +20,24 @@ class _QuizResultsPageState extends State<QuizResultsPage> {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      appBar: null,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+        title: const Text(
+          'Results',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: false,
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: FixedHeader(
-                studentName: user?.displayName ?? 'Student Name',
-                onProfileTap: () {},
-                onSettingsTap: () {},
-                onDrawerOpen: () {},
-              ),
-            ),
             Expanded(
               child: Stack(
                 children: [

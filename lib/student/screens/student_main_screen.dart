@@ -22,12 +22,19 @@ class StudentMainScreen extends StatefulWidget {
 class _StudentMainScreenState extends State<StudentMainScreen> {
   int _selectedIndex = 0;
 
+  void _navigateToProfile() {
+    setState(() {
+      _selectedIndex = 3; // Profile tab index
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final pages = [
       StudentDashboardScreen(
         studentName: widget.studentName,
         tutorId: widget.tutorId,
+        onProfileTap: _navigateToProfile,
       ),
       StudentCategoryScreen(
         studentName: widget.studentName,

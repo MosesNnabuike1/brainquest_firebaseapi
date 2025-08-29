@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_quizzapp/student/widgets/fixed_header.dart';
 // import 'logout_drawer.dart';
 
 class StudentDashboardScreen extends StatefulWidget {
   final String studentName;
   final String? tutorId;
+  final VoidCallback? onProfileTap;
 
   const StudentDashboardScreen({
     Key? key,
     this.studentName = "Student Name",
     this.tutorId,
+    this.onProfileTap,
   }) : super(key: key);
 
   @override
@@ -55,29 +56,44 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+        leadingWidth: 56,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: IconButton(
+            icon: const CircleAvatar(
+              radius: 22,
+              backgroundColor: Color(0xFF181DB4),
+              child: Icon(Icons.person, color: Colors.white, size: 26),
+            ),
+            onPressed: () {
+              final onProfileTap = widget.onProfileTap;
+              if (onProfileTap != null) {
+                onProfileTap();
+              }
+            },
+            tooltip: 'Open profile',
+          ),
+        ),
+        title: Text(
+          "Welcome, ${widget.studentName}",
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
+        centerTitle: false,
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            // Fixed header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: FixedHeader(
-                studentName: widget.studentName,
-                onProfileTap: () {
-                  // TODO: Implement profile tap
-                },
-                onSettingsTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => const AlertDialog(
-                      content: Text('Settings coming soon!'),
-                    ),
-                  );
-                },
-                onDrawerOpen: () => Scaffold.of(context).openDrawer(),
-              ),
-            ),
             // Scrollable content
             Expanded(
               child: SingleChildScrollView(
@@ -86,16 +102,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Welcome Texts
-                    Text(
-                      "Welcome, ${widget.studentName}",
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
                     const Text(
                       "Greatness comes from continuous practices!",
                       style: TextStyle(
@@ -169,7 +175,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                       ),
                       child: InkWell(
                         onTap: () {
-                          // Add navigation or logic for critical thinking
+                          context.push('/daily-critical', extra: {
+                            'tutorId': widget.tutorId,
+                          });
                         },
                         borderRadius: BorderRadius.circular(8),
                         child: const Padding(

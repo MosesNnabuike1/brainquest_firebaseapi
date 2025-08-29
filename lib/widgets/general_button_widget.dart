@@ -32,7 +32,7 @@ class GeneralButtonWidget extends StatelessWidget {
           backgroundColor: backgroundColor,
           padding: padding,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(16),
           ),
           elevation: 0,
         ),

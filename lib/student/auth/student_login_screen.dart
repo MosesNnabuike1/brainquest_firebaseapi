@@ -121,9 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
           _isLoading = false;
           _errorMessage = null;
         });
-        context.go('/home', extra: {
+        context.go('/tutor-id', extra: {
           'studentName': userDoc.data()?['fullName'] ?? email.split('@')[0],
-          'tutorId': null, // Students will need to enter tutor ID later
         });
       }
     } on FirebaseAuthException catch (e) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class CancelIconWidget extends StatelessWidget {
   final VoidCallback? onTap;
@@ -19,7 +20,15 @@ class CancelIconWidget extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(right: rightPadding),
       child: GestureDetector(
-        onTap: onTap ?? () => Navigator.of(context).pop(),
+        onTap: onTap ??
+            () {
+              final navigator = Navigator.of(context);
+              if (navigator.canPop()) {
+                navigator.pop();
+              } else {
+                context.go('/home');
+              }
+            },
         behavior: HitTestBehavior.translucent,
         child: Container(
           width: size + 20,

@@ -255,6 +255,11 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
           IconButton(
+            icon: const Icon(Icons.close),
+            tooltip: 'Close',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          IconButton(
             icon: const Icon(Icons.history),
             tooltip: 'View History',
             onPressed: _showHistory,

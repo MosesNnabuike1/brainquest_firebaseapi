@@ -7,11 +7,13 @@ import 'package:firebase_quizzapp/student/widgets/fixed_header.dart';
 class StudentDashboardScreen extends StatefulWidget {
   final String studentName;
   final String? tutorId;
+  final VoidCallback? onProfileTap;
 
   const StudentDashboardScreen({
     Key? key,
     this.studentName = "Student Name",
     this.tutorId,
+    this.onProfileTap,
   }) : super(key: key);
 
   @override
@@ -63,18 +65,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: FixedHeader(
                 studentName: widget.studentName,
-                onProfileTap: () {
-                  // TODO: Implement profile tap
-                },
-                onSettingsTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => const AlertDialog(
-                      content: Text('Settings coming soon!'),
-                    ),
-                  );
-                },
-                onDrawerOpen: () => Scaffold.of(context).openDrawer(),
+                onProfileTap: widget.onProfileTap,
               ),
             ),
             // Scrollable content
