@@ -185,29 +185,6 @@ class _StudentCategoryScreenState extends State<StudentCategoryScreen> {
     );
   }
 
-  Widget _buildPageTitle() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Choose a Quiz Category",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        SizedBox(height: 6),
-        Text(
-          "Here you can choose a quiz category and practice",
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.black54,
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildCategoryList() {
     print('\n=== Building Category List ===');

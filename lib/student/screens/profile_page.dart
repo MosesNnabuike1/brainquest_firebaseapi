@@ -281,25 +281,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => GeneralButtonWidget(
-        text: 'Confirm Logout',
-        onPressed: () async {
-          Navigator.pop(context);
-          await _auth.signOut();
-          if (mounted) {
-            if (!context.mounted) return;
-            context.go('/');
-          }
-        },
-        backgroundColor: const Color(0xFF181DB4),
-        fontSize: 15,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
