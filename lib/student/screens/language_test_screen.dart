@@ -56,6 +56,42 @@ class _LanguageTestScreenState extends State<LanguageTestScreen> {
         });
         return;
       }
+
+      // Check if student has already taken a language test today and if retakes are allowed
+      final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final existingTest = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_user!.uid)
+          .collection('language_test_attempts')
+          .doc(todayStr)
+          .get();
+
+      if (existingTest.exists) {
+        // Check if any category allows retakes
+        final categoriesSnap = await FirebaseFirestore.instance
+            .collection('categories')
+            .where('tutorId', isEqualTo: tutorId)
+            .get();
+
+        bool anyCategoryAllowsRetakes = false;
+        for (var catDoc in categoriesSnap.docs) {
+          final catData = catDoc.data();
+          if (catData['allowRetakes'] == true) {
+            anyCategoryAllowsRetakes = true;
+            break;
+          }
+        }
+
+        if (!anyCategoryAllowsRetakes) {
+          setState(() {
+            _error =
+                'You have already taken today\'s language test. Retakes are not allowed.';
+            _isLoading = false;
+          });
+          return;
+        }
+      }
+
       // Fetch all language categories for this tutor
       final categoriesSnap = await FirebaseFirestore.instance
           .collection('categories')

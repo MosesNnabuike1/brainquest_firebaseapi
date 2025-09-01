@@ -2,18 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
-class AddQuestionScreen extends StatefulWidget {
+class EditQuestionScreen extends StatefulWidget {
   final String tutorId;
-  final Map<String, dynamic>? questionData;
+  final String questionId;
+  final String categoryId;
 
-  const AddQuestionScreen({Key? key, required this.tutorId, this.questionData})
-      : super(key: key);
+  const EditQuestionScreen({
+    Key? key,
+    required this.tutorId,
+    required this.questionId,
+    required this.categoryId,
+  }) : super(key: key);
 
   @override
-  State<AddQuestionScreen> createState() => _AddQuestionScreenState();
+  State<EditQuestionScreen> createState() => _EditQuestionScreenState();
 }
 
-class _AddQuestionScreenState extends State<AddQuestionScreen> {
+class _EditQuestionScreenState extends State<EditQuestionScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _questionController;
   late TextEditingController _optionAController;
@@ -23,48 +28,79 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
   late TextEditingController _answerController;
 
   bool _isLoading = false;
+  bool _isLoadingQuestion = true;
   bool _isLoadingCategories = true;
   String? _selectedCategoryId;
   List<Map<String, dynamic>> _categories = [];
   String _correctOption = 'A';
+  Map<String, dynamic>? _questionData;
   bool _allowRetakes = true; // Default to allowing retakes
 
   @override
   void initState() {
     super.initState();
-    // Initialize controllers with existing data if editing
-    _questionController =
-        TextEditingController(text: widget.questionData?['question'] ?? '');
-    _optionAController =
-        TextEditingController(text: widget.questionData?['optionA'] ?? '');
-    _optionBController =
-        TextEditingController(text: widget.questionData?['optionB'] ?? '');
-    _optionCController =
-        TextEditingController(text: widget.questionData?['optionC'] ?? '');
-    _optionDController =
-        TextEditingController(text: widget.questionData?['optionD'] ?? '');
-    _answerController =
-        TextEditingController(text: widget.questionData?['answer'] ?? '');
+    _questionController = TextEditingController();
+    _optionAController = TextEditingController();
+    _optionBController = TextEditingController();
+    _optionCController = TextEditingController();
+    _optionDController = TextEditingController();
+    _answerController = TextEditingController();
 
-    // Set correct option and category ID if editing
-    if (widget.questionData != null) {
-      print('Editing question: ${widget.questionData}'); // Debug print
-      if (widget.questionData!['correctOption'] != null) {
-        _correctOption = widget.questionData!['correctOption'];
-        print('Correct option: $_correctOption'); // Debug print
-      }
-      if (widget.questionData!['categoryId'] != null) {
-        _selectedCategoryId = widget.questionData!['categoryId'];
-        print('Category ID: $_selectedCategoryId'); // Debug print
-      }
-      // Load retake setting if editing
-      if (widget.questionData!['allowRetakes'] != null) {
-        _allowRetakes = widget.questionData!['allowRetakes'] ?? true;
-      }
-    }
+    // Set the selected category to the current one
+    _selectedCategoryId = widget.categoryId;
 
-    // Fetch categories after setting initial values
+    // Fetch both the question data and categories
+    _fetchQuestionData();
     _fetchCategories();
+  }
+
+  Future<void> _fetchQuestionData() async {
+    try {
+      print('Fetching question data for ID: ${widget.questionId}');
+      final questionDoc = await FirebaseFirestore.instance
+          .collection('categories')
+          .doc(widget.categoryId)
+          .collection('questions')
+          .doc(widget.questionId)
+          .get();
+
+      if (questionDoc.exists) {
+        final data = questionDoc.data()!;
+        setState(() {
+          _questionData = data;
+          _questionController.text = data['questions'] ?? '';
+          _optionAController.text = data['optionA'] ?? '';
+          _optionBController.text = data['optionB'] ?? '';
+          _optionCController.text = data['optionC'] ?? '';
+          _optionDController.text = data['optionD'] ?? '';
+          _answerController.text = data['answer'] ?? '';
+          _correctOption = data['correctOption'] ?? 'A';
+          _selectedCategoryId = data['categoryId'] ?? widget.categoryId;
+          _allowRetakes = data['allowRetakes'] ?? true; // Load retake setting
+          _isLoadingQuestion = false;
+        });
+
+        print('Question data loaded successfully:');
+        print('Question: ${_questionController.text}');
+        print('Option A: ${_optionAController.text}');
+        print('Option B: ${_optionBController.text}');
+        print('Option C: ${_optionCController.text}');
+        print('Option D: ${_optionDController.text}');
+        print('Answer: ${_answerController.text}');
+        print('Correct option: $_correctOption');
+        print('Category ID: $_selectedCategoryId');
+      } else {
+        print('Question document does not exist');
+        setState(() {
+          _isLoadingQuestion = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching question data: $e');
+      setState(() {
+        _isLoadingQuestion = false;
+      });
+    }
   }
 
   Future<void> _fetchCategories() async {
@@ -77,40 +113,13 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           data['id'] = doc.id;
           return data;
         }).toList();
-
-        // Only set default category if we're not editing an existing question
-        if (_selectedCategoryId == null &&
-            _categories.isNotEmpty &&
-            widget.questionData == null) {
-          _selectedCategoryId = _categories.first['id'];
-        }
-
-        // If editing and category exists, ensure it's in the list
-        if (widget.questionData != null && _selectedCategoryId != null) {
-          final categoryExists =
-              _categories.any((cat) => cat['id'] == _selectedCategoryId);
-          print(
-              'Category exists: $categoryExists, Selected: $_selectedCategoryId'); // Debug print
-          if (!categoryExists && _categories.isNotEmpty) {
-            // If the original category doesn't exist, set to first available
-            _selectedCategoryId = _categories.first['id'];
-            print(
-                'Category not found, setting to: $_selectedCategoryId'); // Debug print
-          }
-        }
-
-        print('Final selected category: $_selectedCategoryId'); // Debug print
         _isLoadingCategories = false;
       });
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to load categories: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      print('Error fetching categories: $e');
+      setState(() {
+        _isLoadingCategories = false;
+      });
     }
   }
 
@@ -125,7 +134,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     super.dispose();
   }
 
-  Future<void> _saveQuestion() async {
+  Future<void> _updateQuestion() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isLoading = true;
@@ -150,7 +159,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
       }
 
       final questionData = {
-        'question': _questionController.text.trim(),
+        'questions': _questionController.text.trim(),
         'optionA': _optionAController.text.trim(),
         'optionB': _optionBController.text.trim(),
         'optionC': _optionCController.text.trim(),
@@ -160,33 +169,22 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
         'correctAnswer': correctAnswerText,
         'categoryId': _selectedCategoryId,
         'tutorId': widget.tutorId,
-        'allowRetakes': _allowRetakes,
-        'createdAt': FieldValue.serverTimestamp(),
+        'allowRetakes': _allowRetakes, // Add retake setting
+        'updatedAt': FieldValue.serverTimestamp(),
       };
 
       try {
-        if (widget.questionData != null && widget.questionData!['id'] != null) {
-          // Update existing question
-          await FirebaseFirestore.instance
-              .collection('categories')
-              .doc(_selectedCategoryId)
-              .collection('questions')
-              .doc(widget.questionData!['id'])
-              .update(questionData);
-        } else {
-          // Add new question
-          await FirebaseFirestore.instance
-              .collection('categories')
-              .doc(_selectedCategoryId)
-              .collection('questions')
-              .add(questionData);
-        }
+        await FirebaseFirestore.instance
+            .collection('categories')
+            .doc(_selectedCategoryId)
+            .collection('questions')
+            .doc(widget.questionId)
+            .update(questionData);
+
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(widget.questionData != null
-                ? 'Question updated successfully!'
-                : 'Question added successfully!'),
+          const SnackBar(
+            content: Text('Question updated successfully!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -195,7 +193,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to save question: ${e.toString()}'),
+            content: Text('Failed to update question: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -210,8 +208,6 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
   }
 
   Widget _buildCategoryDropdown() {
-    print(
-        'Building dropdown - Categories: ${_categories.length}, Selected: $_selectedCategoryId'); // Debug print
     if (_categories.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -225,7 +221,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
       items: _categories.map((category) {
         return DropdownMenuItem<String>(
           value: category['id'],
-          child: Text(category['name'] ?? category['title'] ?? 'Category'),
+          child: Text(category['name'] ?? category['title'] ?? 'Categories'),
         );
       }).toList(),
       onChanged: (value) {
@@ -268,8 +264,6 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
   }
 
   Widget _buildCorrectOptionSelector() {
-    print(
-        'Building correct option selector - Current: $_correctOption'); // Debug print
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -334,18 +328,18 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
   @override
   Widget build(BuildContext context) {
     print('=== BUILD METHOD ===');
-    print('Question data in build: ${widget.questionData}');
+    print('Is loading question: $_isLoadingQuestion');
     print('Is loading categories: $_isLoadingCategories');
-    print('Categories count: ${_categories.length}');
-    print('Selected category: $_selectedCategoryId');
-    print('Correct option: $_correctOption');
+    print('Question data: $_questionData');
+    print('Question controller text: ${_questionController.text}');
+    print('Option A controller text: ${_optionAController.text}');
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          widget.questionData != null ? 'Edit Question' : 'Add Question',
-          style: const TextStyle(
+        title: const Text(
+          'Edit Question',
+          style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
@@ -357,7 +351,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: _isLoadingCategories
+          child: _isLoadingQuestion || _isLoadingCategories
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
@@ -439,10 +433,8 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
                       _buildRetakeToggle(),
                       const SizedBox(height: 32),
                       GeneralButtonWidget(
-                        text: widget.questionData != null
-                            ? 'Update Question'
-                            : 'Add Question',
-                        onPressed: _isLoading ? null : _saveQuestion,
+                        text: 'Update Question',
+                        onPressed: _isLoading ? null : _updateQuestion,
                         enabled: !_isLoading,
                       ),
                     ],

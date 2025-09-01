@@ -13,6 +13,7 @@ import 'package:firebase_quizzapp/tutor/editing/add_category_screen.dart';
 import 'package:firebase_quizzapp/tutor/editing/add_question_screen.dart';
 import 'package:firebase_quizzapp/student/results/quiz_history_page.dart';
 import 'package:firebase_quizzapp/student/auth/student_login_screen.dart';
+import 'package:firebase_quizzapp/tutor/editing/edit_question_screen.dart';
 import 'package:firebase_quizzapp/student/screens/achievements_screen.dart';
 import 'package:firebase_quizzapp/student/screens/student_main_screen.dart';
 import 'package:firebase_quizzapp/tutor/screens/tutor_dashboard_screen.dart';
@@ -228,6 +229,17 @@ class MyApp extends StatelessWidget {
                 tutorId: extra['tutorId'] as String);
           },
         ),
+        GoRoute(
+          path: '/tutor/edit-question',
+          builder: (context, state) {
+            final extra = (state.extra is Map) ? state.extra as Map : const {};
+            return EditQuestionScreen(
+              tutorId: extra['tutorId'] as String,
+              questionId: extra['questionId'] as String,
+              categoryId: extra['categoryId'] as String,
+            );
+          },
+        ),
       ],
     );
 
@@ -315,13 +327,14 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             // Logo
             SizedBox(
-              width: 120,
-              height: 120,
+              width: 80,
+              height: 80,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(15),
                 child: Image.asset(
                   'assets/logo.png',
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
                 ),
               ),
             ),

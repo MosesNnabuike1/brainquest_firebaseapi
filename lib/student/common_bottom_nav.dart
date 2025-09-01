@@ -35,13 +35,18 @@ class CommonBottomNav extends StatelessWidget {
           },
           items: [
             BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                currentIndex == 0
-                    ? 'assets/icons/home1_filled.svg'
-                    : 'assets/icons/home1.svg',
-                width: 24,
-                height: 24,
-              ),
+              icon: currentIndex == 0
+                  ? Image.asset(
+                      'assets/icons/homefilled.png',
+                      width: 24,
+                      height: 24,
+                      color: Colors.white,
+                    )
+                  : SvgPicture.asset(
+                      'assets/icons/home1.svg',
+                      width: 24,
+                      height: 24,
+                    ),
               label: "Home",
             ),
             BottomNavigationBarItem(
@@ -51,26 +56,35 @@ class CommonBottomNav extends StatelessWidget {
                     : 'assets/icons/category.svg',
                 width: 24,
                 height: 24,
+                colorFilter: currentIndex == 1
+                    ? const ColorFilter.mode(Colors.white, BlendMode.srcIn)
+                    : null,
               ),
               label: "Category",
             ),
             BottomNavigationBarItem(
               icon: SvgPicture.asset(
                 currentIndex == 2
-                    ? 'assets/icons/result_filled.svg'
+                    ? 'assets/icons/resultfilled.svg'
                     : 'assets/icons/result.svg',
                 width: 24,
                 height: 24,
+                colorFilter: currentIndex == 2
+                    ? const ColorFilter.mode(Colors.white, BlendMode.srcIn)
+                    : null,
               ),
               label: "Result",
             ),
             BottomNavigationBarItem(
               icon: SvgPicture.asset(
                 currentIndex == 3
-                    ? 'assets/icons/user_filled.svg'
+                    ? 'assets/icons/personfilled.svg'
                     : 'assets/icons/user.svg',
                 width: 24,
                 height: 24,
+                colorFilter: currentIndex == 3
+                    ? const ColorFilter.mode(Colors.white, BlendMode.srcIn)
+                    : null,
               ),
               label: "Profile",
             ),

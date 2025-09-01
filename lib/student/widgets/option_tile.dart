@@ -25,7 +25,9 @@ class OptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isSelected = selectedOption == index;
-    final bool showCorrectColor = isSelected && isCorrect;
+    final bool showCorrectColor = isSelected && isCorrect && showCorrectAnswer;
+    final bool showIncorrectColor =
+        isSelected && !isCorrect && showCorrectAnswer;
 
     return GestureDetector(
       onTap: enabled ? () => onTap(index) : null,
@@ -34,17 +36,25 @@ class OptionTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 18),
         decoration: BoxDecoration(
           color: showCorrectColor
-              ? const Color.fromRGBO(255, 186, 49, 1)
-              : (isSelected
-                  ? const Color.fromARGB(255, 255, 0, 0)
-                  : Colors.white),
+              ? const Color.fromRGBO(255, 186, 49, 1) // Yellow for correct
+              : showIncorrectColor
+                  ? const Color.fromARGB(255, 255, 0, 0) // Red for incorrect
+                  : (isSelected
+                      ? Colors
+                          .blue[50] // Light blue for selected but not submitted
+                      : Colors.white), // White for unselected
           borderRadius: BorderRadius.circular(44),
           border: Border.all(
             color: showCorrectColor
-                ? const Color.fromRGBO(255, 186, 49, 1)
-                : (isSelected
-                    ? const Color.fromARGB(255, 255, 12, 12)
-                    : Colors.grey.shade300),
+                ? const Color.fromRGBO(
+                    255, 186, 49, 1) // Yellow border for correct
+                : showIncorrectColor
+                    ? const Color.fromARGB(
+                        255, 255, 12, 12) // Red border for incorrect
+                    : (isSelected
+                        ? Colors
+                            .blue // Blue border for selected but not submitted
+                        : Colors.grey.shade300), // Grey border for unselected
             width: 2,
           ),
         ),
@@ -59,15 +69,25 @@ class OptionTile extends StatelessWidget {
                 border: Border.all(
                   color: isSelected
                       ? (showCorrectColor
-                          ? const Color.fromRGBO(255, 186, 49, 1)
-                          : Colors.blue)
-                      : Colors.grey.shade400,
+                          ? const Color.fromRGBO(
+                              255, 186, 49, 1) // Yellow for correct
+                          : showIncorrectColor
+                              ? const Color.fromARGB(
+                                  255, 255, 12, 12) // Red for incorrect
+                              : Colors
+                                  .blue) // Blue for selected but not submitted
+                      : Colors.grey.shade400, // Grey for unselected
                   width: 2,
                 ),
                 color: isSelected
                     ? (showCorrectColor
-                        ? const Color.fromRGBO(255, 186, 49, 1)
-                        : Colors.blue)
+                        ? const Color.fromRGBO(
+                            255, 186, 49, 1) // Yellow for correct
+                        : showIncorrectColor
+                            ? const Color.fromARGB(
+                                255, 255, 12, 12) // Red for incorrect
+                            : Colors
+                                .blue) // Blue for selected but not submitted
                     : Colors.transparent,
               ),
               child: isSelected
@@ -86,8 +106,13 @@ class OptionTile extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: showCorrectColor
-                                  ? const Color.fromRGBO(255, 186, 49, 1)
-                                  : Colors.blue,
+                                  ? const Color.fromRGBO(
+                                      255, 186, 49, 1) // Yellow for correct
+                                  : showIncorrectColor
+                                      ? const Color.fromARGB(
+                                          255, 255, 12, 12) // Red for incorrect
+                                      : Colors
+                                          .blue, // Blue for selected but not submitted
                             ),
                           ),
                         ),

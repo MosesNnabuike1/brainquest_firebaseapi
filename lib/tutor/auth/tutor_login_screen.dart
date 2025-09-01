@@ -123,6 +123,7 @@ class _TutorLoginScreenState extends State<TutorLoginScreen> {
                           'assets/logo2.png',
                           width: 24,
                           height: 24,
+                          filterQuality: FilterQuality.high,
                         ),
                         // Cancel icon (optional)
                         IconButton(

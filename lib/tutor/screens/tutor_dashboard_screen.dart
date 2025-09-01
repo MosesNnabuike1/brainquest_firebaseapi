@@ -288,11 +288,6 @@ class _TutorDashboardScreenState extends State<TutorDashboardScreen> {
                                 if (_tutorId != null) {
                                   Clipboard.setData(
                                       ClipboardData(text: _tutorId!));
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            'Tutor ID copied to clipboard!')),
-                                  );
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(

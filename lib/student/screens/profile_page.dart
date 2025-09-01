@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_quizzapp/widgets/general_button_widget.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -281,7 +280,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -292,148 +290,186 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     final name = _userData?['fullName'] ?? '';
     final email = _userData?['email'] ?? _auth.currentUser?.email ?? '';
+
+    const Color primaryColor = Color(0xFF181DB4);
+    const Color accentColor = Color(0xFFFFBA31);
+    const Color cardColor = Color(0xFFF8F8FC);
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text('Profile',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-      ),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Center(
-                    child: CircleAvatar(
-                      radius: 48,
-                      backgroundColor: Color(0xFF181DB4),
-                      child: Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 56,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+      backgroundColor: cardColor,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _userData == null
+              ? const Center(
+                  child: Text('No profile data found.',
+                      style: TextStyle(fontSize: 16, color: Colors.black54)))
+              : CustomScrollView(
+                  slivers: [
+                    SliverAppBar(
+                      pinned: true,
+                      expandedHeight: 220,
+                      backgroundColor: primaryColor,
+                      iconTheme: const IconThemeData(color: Colors.white),
+                      flexibleSpace: FlexibleSpaceBar(
+                        background: Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [primaryColor, accentColor],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.person,
-                                  color: Color(0xFF181DB4)),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  name,
-                                  style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
+                              const CircleAvatar(
+                                radius: 44,
+                                backgroundColor: Colors.white,
+                                child: Icon(Icons.person,
+                                    size: 54, color: primaryColor),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                name.isNotEmpty ? name : 'No Name',
+                                style: const TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 1.2,
                                 ),
                               ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(
-                                    Icons.edit,
-                                    color: Colors.grey,
-                                    size: 20,
-                                  ),
-                                  onPressed: _showEditNameDialog,
-                                  tooltip: 'Edit Name',
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
+                              const SizedBox(height: 4),
+                              Text(
+                                email,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white70,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              const Icon(Icons.email, color: Color(0xFF181DB4)),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  email,
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Colors.black87),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  GeneralButtonWidget(
-                    text: 'Change Password',
-                    onPressed: _showChangePasswordDialog,
-                    fontSize: 16,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.logout,
-                          color: Colors.white, size: 20),
-                      label: const Text(
-                        'Logout',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        textStyle: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
-                      onPressed: () async {
-                        // mirror tutor behavior: sign out and go to splash
-                        await _auth.signOut();
-                        if (!mounted) return;
-                        context.go('/splash');
-                      },
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (_isLoading)
-            Positioned.fill(
-              child: Container(
-                color: Colors.black.withOpacity(0.3),
-                child: const Center(
-                  child: CircularProgressIndicator(),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 32),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 12,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 32, horizontal: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.email,
+                                      color: Color(0xFF181DB4)),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      email,
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 32),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  ElevatedButton.icon(
+                                    icon: const Icon(Icons.edit,
+                                        color: Colors.black, size: 20),
+                                    label: const Text('Change Password',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: accentColor,
+                                      foregroundColor: Colors.black,
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                      textStyle: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    onPressed: _showChangePasswordDialog,
+                                  ),
+                                  const SizedBox(height: 18),
+                                  ElevatedButton.icon(
+                                    icon: const Icon(Icons.edit,
+                                        color: Colors.black, size: 20),
+                                    label: const Text('Edit Profile',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: accentColor,
+                                      foregroundColor: Colors.black,
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                      textStyle: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    onPressed: _showEditNameDialog,
+                                  ),
+                                  const SizedBox(height: 18),
+                                  ElevatedButton.icon(
+                                    icon: const Icon(Icons.logout,
+                                        color: Colors.white, size: 20),
+                                    label: const Text('Logout',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      foregroundColor: Colors.white,
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                      textStyle: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    onPressed: () async {
+                                      // mirror tutor behavior: sign out and go to splash
+                                      await _auth.signOut();
+                                      if (!mounted) return;
+                                      context.go('/splash');
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-        ],
-      ),
     );
   }
 }

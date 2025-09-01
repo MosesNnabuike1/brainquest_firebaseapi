@@ -71,6 +71,57 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
         return;
       }
 
+      // Check if student has already taken a daily quiz today and if retakes are allowed
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final existingDailyQuiz = await FirebaseFirestore.instance
+            .collection('quiz_results')
+            .where('studentId', isEqualTo: user.uid)
+            .where('tutorId', isEqualTo: tutorId)
+            .where('type', isEqualTo: 'daily')
+            .where('timestamp',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(
+                    DateTime.now().subtract(const Duration(days: 1))))
+            .get();
+
+        if (existingDailyQuiz.docs.isNotEmpty) {
+          // Check if any category allows retakes
+          final categoriesSnap = await FirebaseFirestore.instance
+              .collection('categories')
+              .where('tutorId', isEqualTo: tutorId)
+              .get();
+
+          bool anyCategoryAllowsRetakes = false;
+          for (var catDoc in categoriesSnap.docs) {
+            final catData = catDoc.data();
+            if (catData['allowRetakes'] == true) {
+              anyCategoryAllowsRetakes = true;
+              break;
+            }
+          }
+
+          if (!anyCategoryAllowsRetakes) {
+            setState(() {
+              _isLoading = false;
+            });
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                      'You have already taken today\'s daily quiz. Retakes are not allowed.'),
+                  backgroundColor: Colors.orange,
+                  duration: Duration(seconds: 3),
+                ),
+              );
+              Future.delayed(const Duration(milliseconds: 300), () {
+                if (Navigator.canPop(context)) Navigator.pop(context);
+              });
+            }
+            return;
+          }
+        }
+      }
+
       // First, try to fetch from pre-generated daily quizzes
       final dailyQuizDoc = await FirebaseFirestore.instance
           .collection('daily_quizzes')
@@ -314,11 +365,13 @@ class _DailyQuizScreenState extends State<DailyQuizScreen>
                           onTap: _onOptionTap,
                           isCorrect: isCorrect,
                           showCorrectAnswer: _showCorrectOverlay,
-                          enabled: _selectedOption == null,
+                          enabled:
+                              !_showCorrectOverlay, // Allow reselection when not showing overlay
                         ),
                       );
                     }).toList(),
                     const SizedBox(height: 24),
+                    // Submit button
                     GeneralButtonWidget(
                       text: _selectedOption != null
                           ? (_currentQuestionIndex == _questions.length - 1

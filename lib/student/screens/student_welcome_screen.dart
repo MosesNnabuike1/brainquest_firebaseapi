@@ -20,11 +20,14 @@ class StudentWelcomeScreen extends StatelessWidget {
               children: [
                 // Modern Image
                 SizedBox(
-                  width: 100,
-                  height: 100,
+                  width: 70,
+                  height: 70,
                   child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
                     child: Image.asset(
                       'assets/logo.png',
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
                     ),
                   ),
                 ),

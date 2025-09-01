@@ -45,6 +45,42 @@ class _DailyCriticalThinkingScreenState
         });
         return;
       }
+
+      // Check if student has already taken a critical thinking puzzle today and if retakes are allowed
+      final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final existingPuzzle = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_user!.uid)
+          .collection('critical_thinking_attempts')
+          .doc(todayStr)
+          .get();
+
+      if (existingPuzzle.exists) {
+        // Check if any category allows retakes
+        final categoriesSnap = await FirebaseFirestore.instance
+            .collection('categories')
+            .where('tutorId', isEqualTo: widget.tutorId)
+            .get();
+
+        bool anyCategoryAllowsRetakes = false;
+        for (var catDoc in categoriesSnap.docs) {
+          final catData = catDoc.data();
+          if (catData['allowRetakes'] == true) {
+            anyCategoryAllowsRetakes = true;
+            break;
+          }
+        }
+
+        if (!anyCategoryAllowsRetakes) {
+          setState(() {
+            _error =
+                'You have already taken today\'s critical thinking puzzle. Retakes are not allowed.';
+            _isLoading = false;
+          });
+          return;
+        }
+      }
+
       // Fetch all categories for this tutor
       final categoriesSnap = await FirebaseFirestore.instance
           .collection('categories')

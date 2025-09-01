@@ -63,6 +63,7 @@ flutter_native_splash:
   color: "#1976D2"
   image: assets/logo2.png
   branding: assets/brainquest.png
+  branding_mode: bottom
   android: true
   ios: true
   web: false

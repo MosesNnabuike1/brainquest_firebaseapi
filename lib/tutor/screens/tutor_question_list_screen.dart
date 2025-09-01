@@ -103,10 +103,10 @@ class _TutorQuestionListScreenState extends State<TutorQuestionListScreen> {
   }
 
   void _editQuestion(Map<String, dynamic> question) async {
-    await context.push('/tutor/add-question', extra: {
+    await context.push('/tutor/edit-question', extra: {
       'tutorId': widget.tutorId,
-      'question': question,
-      'isEditing': true,
+      'questionId': question['id'],
+      'categoryId': widget.categoryId,
     });
   }
 

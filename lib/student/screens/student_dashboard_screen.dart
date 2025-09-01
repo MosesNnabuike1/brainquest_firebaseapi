@@ -222,9 +222,13 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                       ),
                       child: InkWell(
                         onTap: () {
-                          context.push('/achievements', extra: {
-                            'tutorId': widget.tutorId,
-                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Coming soon!'),
+                              backgroundColor: Color.fromRGBO(253, 126, 125, 1),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
                         },
                         borderRadius: BorderRadius.circular(8),
                         child: const Padding(

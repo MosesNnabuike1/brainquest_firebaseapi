@@ -77,6 +77,57 @@ class _QuestionPageState extends State<QuestionPage>
         _isLoading = true;
       });
 
+      // Check if student has already taken this quiz and if retakes are allowed
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final existingQuiz = await FirebaseFirestore.instance
+            .collection('quiz_results')
+            .where('studentId', isEqualTo: user.uid)
+            .where('tutorId', isEqualTo: widget.tutorId)
+            .where('topic', isEqualTo: widget.topic)
+            .get();
+
+        if (existingQuiz.docs.isNotEmpty) {
+          // Check if category allows retakes
+          final categoryDoc = await FirebaseFirestore.instance
+              .collection('categories')
+              .doc(widget.categoryId)
+              .get();
+
+          if (categoryDoc.exists) {
+            final categoryData = categoryDoc.data()!;
+            final allowRetakes = categoryData['allowRetakes'] ?? false;
+
+            if (!allowRetakes) {
+              setState(() {
+                _isLoading = false;
+              });
+              if (mounted) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Quiz Already Taken'),
+                    content: const Text(
+                        'You have already taken this quiz. Retakes are not allowed for this category.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Close dialog
+                          Navigator.pop(context); // Return to previous screen
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return;
+            }
+          }
+        }
+      }
+
       // Fetch questions from the provider
       final allQuestions =
           await QuestionProvider.getQuestions(widget.categoryId);
@@ -308,12 +359,13 @@ class _QuestionPageState extends State<QuestionPage>
                           onTap: _onOptionTap,
                           isCorrect: isCorrectAnswer,
                           showCorrectAnswer: _showCorrectOverlay,
-                          enabled: _selectedOption == null,
+                          enabled:
+                              !_showCorrectOverlay, // Allow reselection when not showing overlay
                         ),
                       );
                     }).toList(),
                     const SizedBox(height: 24),
-                    // Submit/Next button
+                    // Submit button
                     GeneralButtonWidget(
                       text: _selectedOption != null
                           ? (isLastQuestion ? "Submit" : "Submit")

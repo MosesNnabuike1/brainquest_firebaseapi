@@ -172,6 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         'assets/logo2.png',
                         width: 24,
                         height: 24,
+                        filterQuality: FilterQuality.high,
                       ),
                       CancelIconWidget(
                         onTap: () => context.pop(),
